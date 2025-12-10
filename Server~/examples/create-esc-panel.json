@@ -1,0 +1,46 @@
+{
+  "name": "Create ESC Panel",
+  "description": "创建一个按 ESC 键可以打开/关闭的灰色面板",
+  "stopOnError": true,
+  "defaultDelay": 1000,
+  "outputFile": "esc-panel-results.json",
+  "tools": [
+    {
+      "name": "create_event_system",
+      "params": {},
+      "delay": 500,
+      "description": "创建 EventSystem（如果不存在）"
+    },
+    {
+      "name": "create_u_i_panel",
+      "params": {
+        "panelName": "ESCPanel",
+        "posX": 0,
+        "posY": 0,
+        "width": 800,
+        "height": 600,
+        "color": "#808080FF"
+      },
+      "delay": 1000,
+      "description": "创建灰色面板"
+    },
+    {
+      "name": "set_active_state",
+      "params": {
+        "gameObjectName": "ESCPanel",
+        "isActive": false
+      },
+      "delay": 500,
+      "description": "默认隐藏面板"
+    },
+    {
+      "name": "send_console_log",
+      "params": {
+        "message": "ESC Panel 创建完成！现在需要添加 ESCPanelController 脚本。",
+        "logType": "Log"
+      },
+      "delay": 0
+    }
+  ]
+}
+

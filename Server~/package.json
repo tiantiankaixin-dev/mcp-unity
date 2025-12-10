@@ -1,0 +1,55 @@
+{
+  "name": "mcp-unity-server",
+  "version": "1.0.0",
+  "description": "MCP Unity Server for executing Unity operations and request Editor information",
+  "main": "build/index.js",
+  "type": "module",
+  "mcpName": "io.github.codergamester/mcp-unity",
+  "bin": {
+    "mcp-unity-server": "./build/index.js"
+  },
+  "files": [
+    "build",
+    "README.md",
+    "LICENSE.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js",
+    "start:ws": "node websocket-wrapper.js",
+    "watch": "tsc --watch",
+    "inspector": "npx @modelcontextprotocol/inspector build/index.js",
+    "refresh-tools": "node scripts/refresh-tools.js",
+    "generate-tool": "ts-node scripts/generate-tool.ts",
+    "generate-docs": "ts-node scripts/generate-docs.ts",
+    "validate-tools": "ts-node scripts/validate-tools.ts"
+  },
+  "keywords": [
+    "mcp",
+    "unity",
+    "unity3d",
+    "game",
+    "engine"
+  ],
+  "author": "CoderGamester",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
+    "@types/node": "^22.13.10",
+    "@types/uuid": "^10.0.0",
+    "@types/winreg": "^1.2.36",
+    "@types/ws": "^8.18.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.7.0",
+    "axios": "^1.8.4",
+    "jsonpath-plus": "^10.2.0",
+    "uuid": "^13.0.0",
+    "ws": "^8.18.3",
+    "zod": "^3.24.4",
+    "zod-to-json-schema": "^3.24.3"
+  }
+}

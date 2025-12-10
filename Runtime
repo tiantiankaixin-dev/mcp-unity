@@ -1,0 +1,84 @@
+using UnityEngine;
+
+/// <summary>
+/// 管理 ESC 键切换菜单面板
+/// 将此脚本添加到场景中的任意 GameObject（推荐 Canvas 或 EventSystem）
+/// </summary>
+public class EscapeMenuManager : MonoBehaviour
+{
+    [Header("面板引用")]
+    [Tooltip("拖拽 EscapeMenuPanel 到这里")]
+    public GameObject menuPanel;
+
+    [Header("设置")]
+    [Tooltip("初始状态是否显示面板")]
+    public bool startVisible = false;
+
+    private bool isVisible;
+
+    void Start()
+    {
+        // 如果没有手动设置面板，尝试自动查找
+        if (menuPanel == null)
+        {
+            menuPanel = GameObject.Find("EscapeMenuPanel");
+            
+            if (menuPanel == null)
+            {
+                Debug.LogError("找不到 EscapeMenuPanel！请在 Inspector 中手动设置。");
+                enabled = false;
+                return;
+            }
+        }
+
+        // 设置初始状态
+        isVisible = startVisible;
+        menuPanel.SetActive(isVisible);
+        
+        Debug.Log("ESC Menu Manager 已初始化。按 ESC 键切换菜单。");
+    }
+
+    void Update()
+    {
+        // 检测 ESC 键按下
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ToggleMenu();
+        }
+    }
+
+    /// <summary>
+    /// 切换菜单的显示状态
+    /// </summary>
+    public void ToggleMenu()
+    {
+        if (menuPanel == null) return;
+
+        isVisible = !isVisible;
+        menuPanel.SetActive(isVisible);
+        
+        Debug.Log($"ESC 菜单现在: {(isVisible ? "显示" : "隐藏")}");
+    }
+
+    /// <summary>
+    /// 显示菜单
+    /// </summary>
+    public void ShowMenu()
+    {
+        if (menuPanel == null) return;
+        
+        isVisible = true;
+        menuPanel.SetActive(true);
+    }
+
+    /// <summary>
+    /// 隐藏菜单
+    /// </summary>
+    public void HideMenu()
+    {
+        if (menuPanel == null) return;
+        
+        isVisible = false;
+        menuPanel.SetActive(false);
+    }
+}

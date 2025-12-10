@@ -1,0 +1,66 @@
+{
+  "name": "Create Complete Scene",
+  "description": "Creates a new scene with lights, camera, and basic objects",
+  "stopOnError": false,
+  "defaultDelay": 500,
+  "outputFile": "scene-creation-results.json",
+  "tools": [
+    {
+      "name": "send_console_log",
+      "params": {
+        "message": "Starting scene creation batch...",
+        "logType": "Log"
+      }
+    },
+    {
+      "name": "create_scene",
+      "params": {
+        "sceneName": "MyNewScene",
+        "scenePath": "Assets/Scenes/MyNewScene.unity"
+      },
+      "delay": 1000
+    },
+    {
+      "name": "create_light",
+      "params": {
+        "lightType": "Directional",
+        "name": "MainLight",
+        "intensity": 1.0,
+        "color": "#FFFFFF"
+      }
+    },
+    {
+      "name": "create_camera",
+      "params": {
+        "name": "MainCamera",
+        "position": { "x": 0, "y": 1, "z": -10 },
+        "rotation": { "x": 0, "y": 0, "z": 0 }
+      }
+    },
+    {
+      "name": "create_primitive_object",
+      "params": {
+        "primitiveType": "plane",
+        "name": "Ground",
+        "position": { "x": 0, "y": 0, "z": 0 },
+        "scale": { "x": 10, "y": 1, "z": 10 }
+      }
+    },
+    {
+      "name": "create_primitive_object",
+      "params": {
+        "primitiveType": "cube",
+        "name": "Player",
+        "position": { "x": 0, "y": 0.5, "z": 0 }
+      }
+    },
+    {
+      "name": "send_console_log",
+      "params": {
+        "message": "Scene creation completed!",
+        "logType": "Log"
+      }
+    }
+  ]
+}
+

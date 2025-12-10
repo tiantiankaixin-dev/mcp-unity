@@ -1,0 +1,86 @@
+{
+  "name": "Setup Physics Scene",
+  "description": "Creates objects with physics components",
+  "stopOnError": false,
+  "defaultDelay": 300,
+  "outputFile": "physics-setup-results.json",
+  "tools": [
+    {
+      "name": "send_console_log",
+      "params": {
+        "message": "Setting up physics scene...",
+        "logType": "Log"
+      }
+    },
+    {
+      "name": "create_primitive_object",
+      "params": {
+        "primitiveType": "sphere",
+        "name": "Ball",
+        "position": { "x": 0, "y": 5, "z": 0 }
+      }
+    },
+    {
+      "name": "add_rigidbody",
+      "params": {
+        "gameObjectName": "Ball",
+        "mass": 1.0,
+        "useGravity": true
+      }
+    },
+    {
+      "name": "add_collider",
+      "params": {
+        "gameObjectName": "Ball",
+        "colliderType": "Sphere"
+      }
+    },
+    {
+      "name": "create_primitive_object",
+      "params": {
+        "primitiveType": "cube",
+        "name": "Box",
+        "position": { "x": 2, "y": 3, "z": 0 }
+      }
+    },
+    {
+      "name": "add_rigidbody",
+      "params": {
+        "gameObjectName": "Box",
+        "mass": 2.0,
+        "useGravity": true
+      }
+    },
+    {
+      "name": "add_collider",
+      "params": {
+        "gameObjectName": "Box",
+        "colliderType": "Box"
+      }
+    },
+    {
+      "name": "create_primitive_object",
+      "params": {
+        "primitiveType": "plane",
+        "name": "Ground",
+        "position": { "x": 0, "y": 0, "z": 0 },
+        "scale": { "x": 10, "y": 1, "z": 10 }
+      }
+    },
+    {
+      "name": "add_collider",
+      "params": {
+        "gameObjectName": "Ground",
+        "colliderType": "Box"
+      }
+    },
+    {
+      "name": "send_console_log",
+      "params": {
+        "message": "Physics scene setup completed!",
+        "logType": "Log"
+      }
+    }
+  ]
+}
+

@@ -1,0 +1,73 @@
+{
+  "name": "Create UI Menu",
+  "description": "Creates a complete UI menu with buttons and panels",
+  "stopOnError": false,
+  "defaultDelay": 200,
+  "outputFile": "ui-creation-results.json",
+  "tools": [
+    {
+      "name": "send_console_log",
+      "params": {
+        "message": "Creating UI menu...",
+        "logType": "Log"
+      }
+    },
+    {
+      "name": "create_event_system",
+      "params": {
+        "name": "EventSystem"
+      }
+    },
+    {
+      "name": "create_u_i_panel",
+      "params": {
+        "name": "MainMenuPanel",
+        "width": 400,
+        "height": 600
+      }
+    },
+    {
+      "name": "create_u_i_text",
+      "params": {
+        "name": "TitleText",
+        "text": "Main Menu",
+        "fontSize": 32
+      }
+    },
+    {
+      "name": "create_u_i_button",
+      "params": {
+        "name": "StartButton",
+        "text": "Start Game",
+        "width": 200,
+        "height": 50
+      }
+    },
+    {
+      "name": "create_u_i_button",
+      "params": {
+        "name": "OptionsButton",
+        "text": "Options",
+        "width": 200,
+        "height": 50
+      }
+    },
+    {
+      "name": "create_u_i_button",
+      "params": {
+        "name": "QuitButton",
+        "text": "Quit",
+        "width": 200,
+        "height": 50
+      }
+    },
+    {
+      "name": "send_console_log",
+      "params": {
+        "message": "UI menu created successfully!",
+        "logType": "Log"
+      }
+    }
+  ]
+}
+
