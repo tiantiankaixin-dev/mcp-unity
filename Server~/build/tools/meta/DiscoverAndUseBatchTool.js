@@ -53,8 +53,7 @@ const DiscoverAndUseBatchArgsSchema = z.object({
     tools: z
         .array(ToolCallSchema)
         .min(1)
-        .max(20)
-        .describe('Array of tools to execute in sequence (max 20). Use params_mapping with $.{index}.field to chain outputs.')
+        .describe('Array of tools to execute in sequence (no limit). Use params_mapping with $.{index}.field to chain outputs.')
 });
 /**
  * DiscoverAndUseBatchTool - Execute multiple Unity tools in sequence with parameter chaining

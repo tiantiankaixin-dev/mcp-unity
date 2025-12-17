@@ -72,7 +72,7 @@ namespace McpUnity.Tools
                 if (animator == null)
                 {
                     return McpUnitySocketHandler.CreateErrorResponse(
-                        $"Animator component not found on {gameObjectPath}", "not_found");
+                        $"Animator component not found on '{obj.name}'. Please add an Animator component first using 'add_animator' tool.", "not_found");
                 }
 
                 AnimatorController controller = animator.runtimeAnimatorController as AnimatorController;

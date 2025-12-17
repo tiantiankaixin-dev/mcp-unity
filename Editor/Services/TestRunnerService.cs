@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using McpUnity.Unity;
 using McpUnity.Utils;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEditor.TestTools.TestRunner.Api;
 using Newtonsoft.Json.Linq;
 
@@ -73,6 +75,16 @@ namespace McpUnity.Services
         /// <returns>Task that resolves with test results when tests are complete</returns>
         public async Task<JObject> ExecuteTestsAsync(TestMode testMode, bool returnOnlyFailures, bool returnWithLogs, string testFilter = "")
         {
+            // 先静默保存所有已修改的场景，避免弹出保存对话框阻塞测试
+            for (int i = 0; i < SceneManager.sceneCount; i++)
+            {
+                var scene = SceneManager.GetSceneAt(i);
+                if (scene.isDirty && !string.IsNullOrEmpty(scene.path))
+                {
+                    EditorSceneManager.SaveScene(scene);
+                }
+            }
+            
             var filter = new Filter { testMode = testMode };
 
             _tcs = new TaskCompletionSource<JObject>();

@@ -17,9 +17,9 @@ export declare class CreateScriptableObjectTool extends BaseTool {
         assetName: string;
         typeName?: string | undefined;
     }, {
-        typeName?: string | undefined;
         savePath?: string | undefined;
         assetName?: string | undefined;
+        typeName?: string | undefined;
     }>;
     get category(): string;
     protected formatSuccessResponse(result: any): CallToolResult;

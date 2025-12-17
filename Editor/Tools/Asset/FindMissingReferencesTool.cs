@@ -36,6 +36,16 @@ namespace McpUnity.Tools
 
                 if (scanProject)
                 {
+                    // 先静默保存当前已修改的场景，避免弹出保存对话框
+                    for (int i = 0; i < SceneManager.sceneCount; i++)
+                    {
+                        var currentScene = SceneManager.GetSceneAt(i);
+                        if (currentScene.isDirty && !string.IsNullOrEmpty(currentScene.path))
+                        {
+                            EditorSceneManager.SaveScene(currentScene);
+                        }
+                    }
+                    
                     // 扫描整个项目的所有场景
                     string[] scenePaths = AssetDatabase.FindAssets("t:Scene");
                     

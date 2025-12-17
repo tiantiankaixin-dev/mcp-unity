@@ -20,7 +20,7 @@ export function registerGetToolNamesResource(server, logger) {
     });
     // Register this templated resource with the MCP server
     server.resource(resourceName, resourceTemplate, {
-        description: 'Get tool schemas. MUST use discover_and_use_batch for 2+ operations! Categories: gameobject, material, physics, ui, terrain, animation, scripting, scene, prefab, lighting, camera, audio, vfx',
+        description: '🚨 PLAN FIRST! Get schemas, design sequence, THEN batch execute. MANDATORY: discover_and_use_batch for 2+ tools. Zero-registration: all tools on-demand.',
         mimeType: resourceMimeType
     }, async (uri, variables) => {
         try {
@@ -115,7 +115,8 @@ async function resourceHandler(uri, variables, logger) {
     });
     const response = {
         // CRITICAL instruction for AI
-        _batch: "⚠️ ALWAYS use discover_and_use_batch for 2+ operations! Chain outputs with $.{index}.field",
+        _workflow: "🚨 ABSOLUTE: 1) PLAN tool sequence NOW, 2) EXECUTE with discover_and_use_batch (2+ tools). Chain: $.{index}.field (e.g., $.0.instanceId → $.1.targetId)",
+        _zeroRegistration: "All tools available on-demand. No pre-registration needed.",
         category: category,
         toolCount: tools.length,
         tools: tools

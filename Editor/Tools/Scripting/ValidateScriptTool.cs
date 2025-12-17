@@ -35,10 +35,17 @@ namespace McpUnity.Tools
                         "scriptPath is required", "validation_error");
                 }
 
-                if (!File.Exists(scriptPath))
+                // Support relative paths starting with Assets/
+                string fullPath = scriptPath;
+                if (scriptPath.StartsWith("Assets/") || scriptPath.StartsWith("Assets\\"))
+                {
+                    fullPath = Path.Combine(Application.dataPath.Replace("/Assets", ""), scriptPath.Replace("/", Path.DirectorySeparatorChar.ToString()));
+                }
+
+                if (!File.Exists(fullPath))
                 {
                     return McpUnitySocketHandler.CreateErrorResponse(
-                        $"Script file not found: {scriptPath}", "not_found");
+                        $"Script file not found: {scriptPath}. Full path checked: {fullPath}", "not_found");
                 }
 
                 JArray issues = new JArray();
@@ -54,7 +61,7 @@ namespace McpUnity.Tools
                     });
                 }
 
-                string content = File.ReadAllText(scriptPath);
+                string content = File.ReadAllText(fullPath);
                 string fileName = Path.GetFileNameWithoutExtension(scriptPath);
 
                 // 2. Check Naming Conventions (Basic)

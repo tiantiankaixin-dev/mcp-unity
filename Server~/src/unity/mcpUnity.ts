@@ -85,9 +85,9 @@ export class McpUnity {
     const configHost = process.env.UNITY_HOST || config.Host;
     this.host = configHost || 'localhost';
     
-    // Initialize timeout from environment variable (in seconds; it is the same as Cline) or use default (10 seconds)
+    // Initialize timeout from environment variable (in seconds; it is the same as Cline) or use default (120 seconds for long operations)
     const configTimeout = config.RequestTimeoutSeconds;
-    this.requestTimeout = configTimeout ? parseInt(configTimeout, 10) * 1000 : 10000;
+    this.requestTimeout = configTimeout ? parseInt(configTimeout, 10) * 1000 : 120000;
     this.logger.info(`Using request timeout: ${this.requestTimeout / 1000} seconds`);
   }
   

@@ -57,7 +57,7 @@ namespace McpUnity.Tools
                 if (rb == null)
                 {
                     return McpUnitySocketHandler.CreateErrorResponse(
-                        $"Rigidbody component not found on {gameObjectPath}", "not_found");
+                        $"Rigidbody component not found on '{obj.name}'. Please add a Rigidbody component first using 'add_rigidbody' tool.", "not_found");
                 }
 
                 Undo.RecordObject(rb, "Configure Rigidbody");

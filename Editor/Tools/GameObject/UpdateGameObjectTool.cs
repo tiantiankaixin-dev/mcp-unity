@@ -29,7 +29,23 @@ namespace McpUnity.Tools
         public override JObject Execute(JObject parameters)
         {
             // Extract parameters from JObject
-            int? instanceId = parameters["instanceId"]?.ToObject<int?>();
+            int? instanceId = null;
+            var instanceIdToken = parameters["instanceId"];
+            if (instanceIdToken != null)
+            {
+                // Handle both int and string formats
+                if (instanceIdToken.Type == JTokenType.Integer)
+                {
+                    instanceId = instanceIdToken.ToObject<int>();
+                }
+                else if (instanceIdToken.Type == JTokenType.String)
+                {
+                    if (int.TryParse(instanceIdToken.ToString(), out int parsedId))
+                    {
+                        instanceId = parsedId;
+                    }
+                }
+            }
             string objectPath = parameters["objectPath"]?.ToObject<string>();
             JObject gameObjectData = parameters["gameObjectData"] as JObject;
 

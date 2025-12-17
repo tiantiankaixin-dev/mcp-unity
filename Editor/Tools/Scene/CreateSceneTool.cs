@@ -74,6 +74,16 @@ namespace McpUnity.Tools
 
             try
             {
+                // 先静默保存当前已修改的场景，避免弹出保存对话框
+                for (int i = 0; i < UnityEngine.SceneManagement.SceneManager.sceneCount; i++)
+                {
+                    var currentScene = UnityEngine.SceneManagement.SceneManager.GetSceneAt(i);
+                    if (currentScene.isDirty && !string.IsNullOrEmpty(currentScene.path))
+                    {
+                        UnityEditor.SceneManagement.EditorSceneManager.SaveScene(currentScene);
+                    }
+                }
+                
                 var newScene = UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.DefaultGameObjects, UnityEditor.SceneManagement.NewSceneMode.Single);
 
                 bool saved = UnityEditor.SceneManagement.EditorSceneManager.SaveScene(newScene, scenePath);

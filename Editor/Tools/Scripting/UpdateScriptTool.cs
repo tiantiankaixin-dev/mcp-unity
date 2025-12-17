@@ -42,13 +42,20 @@ namespace McpUnity.Tools
                         "operation is required (add_field, add_method, add_using, rename_class, etc.)", "validation_error");
                 }
 
-                if (!File.Exists(scriptPath))
+                // Support relative paths starting with Assets/
+                string fullPath = scriptPath;
+                if (scriptPath.StartsWith("Assets/") || scriptPath.StartsWith("Assets\\"))
                 {
-                    return McpUnitySocketHandler.CreateErrorResponse(
-                        $"Script file not found: {scriptPath}", "not_found");
+                    fullPath = Path.Combine(Application.dataPath.Replace("/Assets", ""), scriptPath.Replace("/", Path.DirectorySeparatorChar.ToString()));
                 }
 
-                string content = File.ReadAllText(scriptPath);
+                if (!File.Exists(fullPath))
+                {
+                    return McpUnitySocketHandler.CreateErrorResponse(
+                        $"Script file not found: {scriptPath}. Full path checked: {fullPath}", "not_found");
+                }
+
+                string content = File.ReadAllText(fullPath);
                 string newContent = content;
 
                 switch (operation)
@@ -90,7 +97,7 @@ namespace McpUnity.Tools
                 
                 if (wasModified)
                 {
-                    File.WriteAllText(scriptPath, newContent);
+                    File.WriteAllText(fullPath, newContent);
                     AssetDatabase.Refresh();
                     McpLogger.LogInfo($"Updated script: {scriptPath} (operation: {operation})");
                 }
