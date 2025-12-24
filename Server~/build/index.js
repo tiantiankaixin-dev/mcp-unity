@@ -9,6 +9,7 @@ import { registerGetGameObjectSimpleResource } from './resources/getGameObjectSi
 import { registerGetToolNamesResource } from './resources/getToolNamesResource.js';
 import { registerGetToolSchemaResource } from './resources/getToolSchemaResource.js';
 import { registerGetAllToolsResource } from './resources/getAllToolsResource.js';
+import { registerGetToolCategoriesResource } from './resources/getToolCategoriesResource.js';
 // ❌ Removed: Prompts are redundant - workflow is in server description and resource responses
 // import { registerSessionStartPrompt } from './prompts/sessionStartPrompt.js';
 // import { registerToolDiscoveryPrompt } from './prompts/toolDiscoveryPrompt.js';
@@ -66,7 +67,7 @@ toolLogger.info('💡 Token consumption: ~100-200 tokens/conversation (vs 10,000
 toolLogger.info('📚 Other 100+ tools available via: unity://tool-names/{category} resources');
 // Register ONLY essential resources for the optimized workflow
 // ⚡ RECOMMENDED: Get tool categories overview (merged from getAllToolsResource)
-// registerGetToolCategoriesResource(server, resourceLogger);
+registerGetToolCategoriesResource(server, resourceLogger);
 // Compatibility: legacy clients/prompts may still query unity://all-tools
 registerGetAllToolsResource(server, resourceLogger);
 // 🎯 Query by category for specific tool details

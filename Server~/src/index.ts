@@ -33,6 +33,7 @@ import { registerGetToolSchemaResource } from './resources/getToolSchemaResource
 import { registerGetUsageGuideResource } from './resources/getUsageGuideResource.js';
 import { registerGetGettingStartedResource } from './resources/getGettingStartedResource.js';
 import { registerGetAllToolsResource } from './resources/getAllToolsResource.js';
+import { registerGetToolCategoriesResource } from './resources/getToolCategoriesResource.js';
 // ❌ Removed: Prompts are redundant - workflow is in server description and resource responses
 // import { registerSessionStartPrompt } from './prompts/sessionStartPrompt.js';
 // import { registerToolDiscoveryPrompt } from './prompts/toolDiscoveryPrompt.js';
@@ -106,7 +107,7 @@ toolLogger.info('📚 Other 100+ tools available via: unity://tool-names/{catego
 // Register ONLY essential resources for the optimized workflow
 
 // ⚡ RECOMMENDED: Get tool categories overview (merged from getAllToolsResource)
-// registerGetToolCategoriesResource(server, resourceLogger);
+registerGetToolCategoriesResource(server, resourceLogger);
 
 // Compatibility: legacy clients/prompts may still query unity://all-tools
 registerGetAllToolsResource(server, resourceLogger);
