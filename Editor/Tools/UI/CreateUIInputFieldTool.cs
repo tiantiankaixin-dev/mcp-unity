@@ -22,8 +22,37 @@ namespace McpUnity.Tools
             try
             {
                 string inputFieldName = parameters["inputFieldName"]?.ToObject<string>() ?? "InputField";
-                float posX = parameters["posX"]?.ToObject<float>() ?? 0f;
-                float posY = parameters["posY"]?.ToObject<float>() ?? 0f;
+                // ✅ 支持两种位置格式 (2D UI)
+
+                float posX = 0f, posY = 0f;
+
+                if (parameters["position"] != null && parameters["position"].Type == JTokenType.Array)
+
+                {
+
+                    var pos = parameters["position"].ToObject<float[]>();
+
+                    if (pos.Length >= 2)
+
+                    {
+
+                        posX = pos[0];
+
+                        posY = pos[1];
+
+                    }
+
+                }
+
+                else
+
+                {
+
+                    posX = parameters["posX"]?.ToObject<float>() ?? 0f;
+
+                    posY = parameters["posY"]?.ToObject<float>() ?? 0f;
+
+                }
                 float width = parameters["width"]?.ToObject<float>() ?? 200f;
                 float height = parameters["height"]?.ToObject<float>() ?? 30f;
                 string placeholder = parameters["placeholder"]?.ToObject<string>() ?? "Enter text...";

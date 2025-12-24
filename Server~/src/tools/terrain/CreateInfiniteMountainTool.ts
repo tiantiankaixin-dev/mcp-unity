@@ -23,6 +23,7 @@ const CreateInfiniteMountainToolArgsSchema = z.object({
     .describe('Intensity of mountain ridges (0-1). Default: 0.3'),
   seed: z.number().int().optional()
     .describe('Random seed for terrain generation. Random if not specified.'),
+  position: z.array(z.number()).length(3).optional().describe('Position as [x, y, z]. Fallback to posX/posY/posZ if not provided'),
   posX: z.number().optional().default(0)
     .describe('X position of terrain manager. Default: 0'),
   posY: z.number().optional().default(0)

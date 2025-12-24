@@ -26,15 +26,17 @@ import { registerGetAssetsResource } from './resources/getAssetsResource.js';
 import { registerGetTestsResource } from './resources/getTestsResource.js';
 import { registerGetGameObjectResource } from './resources/getGameObjectResource.js';
 import { registerGetGameObjectSimpleResource } from './resources/getGameObjectSimpleResource.js';
-import { registerGetToolCategoriesResource } from './resources/getToolCategoriesResource.js';
+// import { registerGetToolCategoriesResource } from './resources/getToolCategoriesResource.js';
 // import { registerGetToolsByCategoryResource } from './resources/getToolsByCategoryResource.js'; // ❌ Removed - too verbose
 import { registerGetToolNamesResource } from './resources/getToolNamesResource.js';
 import { registerGetToolSchemaResource } from './resources/getToolSchemaResource.js';
 import { registerGetUsageGuideResource } from './resources/getUsageGuideResource.js';
 import { registerGetGettingStartedResource } from './resources/getGettingStartedResource.js';
-import { registerSessionStartPrompt } from './prompts/sessionStartPrompt.js';
-import { registerToolDiscoveryPrompt } from './prompts/toolDiscoveryPrompt.js';
-import { registerGameObjectHandlingPrompt } from './prompts/gameobjectHandlingPrompt.js';
+import { registerGetAllToolsResource } from './resources/getAllToolsResource.js';
+// ❌ Removed: Prompts are redundant - workflow is in server description and resource responses
+// import { registerSessionStartPrompt } from './prompts/sessionStartPrompt.js';
+// import { registerToolDiscoveryPrompt } from './prompts/toolDiscoveryPrompt.js';
+// import { registerGameObjectHandlingPrompt } from './prompts/gameobjectHandlingPrompt.js';
 
 // No need to import individual tools anymore - ToolRegistry handles it automatically
 
@@ -45,24 +47,19 @@ const toolLogger = new Logger('Tools', LogLevel.INFO);
 const resourceLogger = new Logger('Resources', LogLevel.INFO);
 
 // Initialize the MCP server
-const server = new McpServer (
+ const server = new McpServer (
   {
     name: "MCP Unity Server",
     version: "1.0.0",
-    description: `Unity Editor MCP with 100+ tools. Zero-registration architecture.
+    description: `Unity Editor MCP. ⚠️ DO NOT guess tool names!
 
-⚠️ **FIRST STEP - ALWAYS QUERY BEFORE EXECUTE:**
-read_resource('unity://tool-names/gameobject')  // or: material, physics, ui, terrain, etc.
-
-📖 WORKFLOW:
-1. QUERY: read_resource('unity://tool-names/{category}') → get tool names
-2. PLAN: List tools needed for the task
-3. EXECUTE: ONE discover_and_use_batch call with params_mapping
-
-📚 RESOURCES:
-- unity://tool-categories → all categories
-- unity://tool-names/{cat} → tool list (QUERY THIS FIRST!)
-- unity://tool/{name} → tool params`
+PLAN FIRST, THEN EXECUTE:
+1. list_categories - get available categories
+2. get_tool_names({category}) - get exact tool names
+3. Plan all tools needed
+4. get_tool_schemas([tools]) - get parameter definitions if needed
+5. discover_and_use_batch - execute with correct tool names
+`
   },
   {
     capabilities: {
@@ -107,16 +104,20 @@ toolLogger.info('💡 Token consumption: ~100-200 tokens/conversation (vs 10,000
 toolLogger.info('📚 Other 100+ tools available via: unity://tool-names/{category} resources');
 
 // Register ONLY essential resources for the optimized workflow
-// 🎯 Step 1: Query tool categories
-registerGetToolCategoriesResource(server, resourceLogger);
 
-// 🎯 Step 2a: Query tool names in category (lightweight, ~50 tokens/category)
+// ⚡ RECOMMENDED: Get tool categories overview (merged from getAllToolsResource)
+// registerGetToolCategoriesResource(server, resourceLogger);
+
+// Compatibility: legacy clients/prompts may still query unity://all-tools
+registerGetAllToolsResource(server, resourceLogger);
+
+// 🎯 Query by category for specific tool details
 registerGetToolNamesResource(server, resourceLogger);
 
-// 🎯 Step 2b: Query specific tool schema (only when needed, ~150 tokens/tool)
+// 🎯 Optional: Query specific tool schema (only when needed, ~150 tokens/tool)
 registerGetToolSchemaResource(server, resourceLogger);
 
-// 🎯 Step 3: Use tools via discover_and_use_tool (already registered as meta tools)
+// 🎯 Execution: Use tools via discover_and_use_tool/batch (already registered as meta tools)
 
 // 🔍 Optional: Query specific GameObject (for getting instanceId after creation)
 registerGetGameObjectSimpleResource(server, mcpUnity, resourceLogger);
@@ -131,8 +132,11 @@ registerGetGameObjectSimpleResource(server, mcpUnity, resourceLogger);
 // - scenes_hierarchy (use gameobject-simple instead)
 // - tests, menu-items, console-logs, packages, assets (not core workflow)
 
-// ❌ Removed prompts to minimize list_resources output
-// AI should follow the server description instead of reading prompts
+// ❌ Removed prompts - workflow integrated into:
+// 1. Server description (shows in MCP client)
+// 2. Resource responses (_instruction, _workflow fields)
+// 3. Tool descriptions
+// This eliminates redundancy and reduces token usage
 
 // Server startup function
 async function startServer() {

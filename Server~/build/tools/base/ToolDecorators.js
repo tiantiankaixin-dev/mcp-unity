@@ -208,3 +208,28 @@ export function Author(name, email) {
         return constructor;
     };
 }
+/**
+ * Decorator to mark a tool as server-only (does not require Unity connection)
+ * Server-only tools execute entirely on the MCP server without sending requests to Unity.
+ * Use this for tools that work with local data, statistics, or server-side operations.
+ *
+ * @example
+ * ```typescript
+ * @ServerOnly()
+ * @Tool({ name: 'check_workflow_status', category: 'debug' })
+ * export class CheckWorkflowStatusTool extends BaseTool {
+ *   // Implementation that doesn't need Unity...
+ * }
+ * ```
+ */
+export function ServerOnly() {
+    return function (constructor) {
+        const originalMetadata = constructor.metadata || {};
+        constructor.metadata = {
+            ...originalMetadata,
+            serverOnly: true,
+            tags: [...(originalMetadata.tags || []), 'server-only']
+        };
+        return constructor;
+    };
+}

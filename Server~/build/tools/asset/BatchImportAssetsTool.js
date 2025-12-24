@@ -34,7 +34,7 @@ var __runInitializers = (this && this.__runInitializers) || function (thisArg, i
 };
 import { z } from 'zod';
 import { BaseTool } from '../base/BaseTool.js';
-import { Tool, Tags } from '../base/ToolDecorators.js';
+import { Tool, Tags, Async } from '../base/ToolDecorators.js';
 /**
  * Tool for batch importing assets from a folder
  *
@@ -42,6 +42,8 @@ import { Tool, Tags } from '../base/ToolDecorators.js';
  *
  * Unity API: UnityEditor.AssetDatabase.ImportAsset
  * C# Handler: Editor/Tools/BatchImportAssetsTool.cs
+ *
+ * Note: This can be a long-running operation depending on number and size of assets.
  *
  * @see https://docs.unity3d.com/ScriptReference/AssetDatabase.ImportAsset.html
  *
@@ -56,9 +58,9 @@ import { Tool, Tags } from '../base/ToolDecorators.js';
  * @category asset
  */
 let BatchImportAssetsTool = (() => {
-    let _classDecorators = [Tool({
+    let _classDecorators = [Async(), Tool({
             name: 'batch_import_assets',
-            description: 'Import multiple assets from a folder',
+            description: 'Import multiple assets from a folder. This may take time depending on number and size of assets.',
             category: 'asset',
             version: '1.0.0'
         }), Tags(['unity', 'asset', 'import', 'batch'])];

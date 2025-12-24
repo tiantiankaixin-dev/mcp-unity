@@ -21,9 +21,45 @@ namespace McpUnity.Tools
             try
             {
                 string probeName = parameters["probeName"]?.ToObject<string>() ?? "ReflectionProbe";
-                float posX = parameters["posX"]?.ToObject<float>() ?? 0f;
-                float posY = parameters["posY"]?.ToObject<float>() ?? 1f;
-                float posZ = parameters["posZ"]?.ToObject<float>() ?? 0f;
+                // ✅ 支持两种位置格式
+
+                float posX = 0f, posY = 0f, posZ = 0f;
+
+                if (parameters["position"] != null && parameters["position"].Type == JTokenType.Array)
+
+                {
+
+                    // 数组格式: position: [x, y, z]
+
+                    var pos = parameters["position"].ToObject<float[]>();
+
+                    if (pos.Length >= 3)
+
+                    {
+
+                        posX = pos[0];
+
+                        posY = pos[1];
+
+                        posZ = pos[2];
+
+                    }
+
+                }
+
+                else
+
+                {
+
+                    // 分离格式: posX, posY, posZ
+
+                    posX = parameters["posX"]?.ToObject<float>() ?? 0f;
+
+                    posY = parameters["posY"]?.ToObject<float>() ?? 1f;
+
+                    posZ = parameters["posZ"]?.ToObject<float>() ?? 0f;
+
+                }
                 float size = parameters["size"]?.ToObject<float>() ?? 10f;
                 int resolution = parameters["resolution"]?.ToObject<int>() ?? 128;
 

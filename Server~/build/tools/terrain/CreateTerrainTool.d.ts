@@ -13,6 +13,7 @@ export declare class CreateTerrainTool extends BaseTool {
         width: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         length: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         height: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
+        position: z.ZodOptional<z.ZodArray<z.ZodNumber, "many">>;
         posX: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         posY: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         posZ: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
@@ -24,8 +25,10 @@ export declare class CreateTerrainTool extends BaseTool {
         width: number;
         height: number;
         terrainName: string;
+        position?: number[] | undefined;
     }, {
         length?: number | undefined;
+        position?: number[] | undefined;
         posX?: number | undefined;
         posY?: number | undefined;
         posZ?: number | undefined;

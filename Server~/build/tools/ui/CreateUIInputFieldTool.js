@@ -40,6 +40,7 @@ import { Tool, Tags } from '../base/ToolDecorators.js';
  */
 const CreateUIInputFieldToolArgsSchema = z.object({
     inputFieldName: z.string().optional().default('InputField').describe('Name for the InputField GameObject. Default: "InputField"'),
+    position: z.array(z.number()).length(3).optional().describe('Position as [x, y, z]. Fallback to posX/posY/posZ if not provided'),
     posX: z.number().optional().default(0).describe('X position in canvas space. Default: 0'),
     posY: z.number().optional().default(0).describe('Y position in canvas space. Default: 0'),
     width: z.number().optional().default(200).describe('Width of the input field. Default: 200'),

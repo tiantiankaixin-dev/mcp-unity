@@ -10,15 +10,15 @@ export declare class ChangeMaterialColorTool extends BaseTool {
     get description(): string;
     get inputSchema(): z.ZodObject<{
         instanceIds: z.ZodArray<z.ZodNumber, "many">;
-        color: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+        color: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodNumber, "many">>>;
         propertyName: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     }, "strip", z.ZodTypeAny, {
         instanceIds: number[];
-        color: string;
+        color: number[];
         propertyName: string;
     }, {
         instanceIds: number[];
-        color?: string | undefined;
+        color?: number[] | undefined;
         propertyName?: string | undefined;
     }>;
     get category(): string;

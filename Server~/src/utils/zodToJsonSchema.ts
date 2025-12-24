@@ -106,24 +106,18 @@ export function zodToReadableSchema(zodSchema: any): any {
       continue;
     }
 
-    const fieldInfo: any = {
-      type: getZodType(field),
-      required: !isOptional(field)
-    };
-
-    // Get description
-    if (description) {
-      fieldInfo.description = description;
-    }
-
-    // Get default value
+    // Compact format: "type" or "type=default" or "type!" (required)
+    const type = getZodType(field);
     const defaultValue = getDefaultValue(field);
+    const required = !isOptional(field) && defaultValue === undefined;
+    
     if (defaultValue !== undefined) {
-      fieldInfo.default = defaultValue;
-      fieldInfo.required = false;
+      result[key] = `${type}=${JSON.stringify(defaultValue)}`;
+    } else if (required) {
+      result[key] = `${type}!`;
+    } else {
+      result[key] = type;
     }
-
-    result[key] = fieldInfo;
   }
 
   return result;

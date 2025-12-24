@@ -17,6 +17,7 @@ export declare class CreateInfiniteMountainTool extends BaseTool {
         detailScale: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         ridgeIntensity: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         seed: z.ZodOptional<z.ZodNumber>;
+        position: z.ZodOptional<z.ZodArray<z.ZodNumber, "many">>;
         posX: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         posY: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         posZ: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
@@ -33,8 +34,10 @@ export declare class CreateInfiniteMountainTool extends BaseTool {
         detailScale: number;
         ridgeIntensity: number;
         createViewer: boolean;
+        position?: number[] | undefined;
         seed?: number | undefined;
     }, {
+        position?: number[] | undefined;
         posX?: number | undefined;
         posY?: number | undefined;
         posZ?: number | undefined;

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { BaseTool } from '../base/BaseTool.js';
-import { Tool, Tags } from '../base/ToolDecorators.js';
+import { Tool, Tags, Async } from '../base/ToolDecorators.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 
 /**
@@ -13,10 +13,13 @@ const BakeLightingToolArgsSchema = z.object({
 /**
  * BakeLighting Tool
  * Bakes lighting for the scene
+ * 
+ * Note: This is a long-running async operation (up to 5 minutes timeout on Unity side)
  */
+@Async()
 @Tool({
   name: 'bake_lighting',
-  description: 'Bakes lighting for the scene',
+  description: 'Bakes lighting for the scene. This is a long-running operation that may take several minutes.',
   category: 'lighting',
   version: '1.0.0'
 })

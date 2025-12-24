@@ -90,21 +90,19 @@ export function zodToReadableSchema(zodSchema) {
         if (description && ALIAS_KEYWORDS.some(keyword => description.includes(keyword))) {
             continue;
         }
-        const fieldInfo = {
-            type: getZodType(field),
-            required: !isOptional(field)
-        };
-        // Get description
-        if (description) {
-            fieldInfo.description = description;
-        }
-        // Get default value
+        // Compact format: "type" or "type=default" or "type!" (required)
+        const type = getZodType(field);
         const defaultValue = getDefaultValue(field);
+        const required = !isOptional(field) && defaultValue === undefined;
         if (defaultValue !== undefined) {
-            fieldInfo.default = defaultValue;
-            fieldInfo.required = false;
+            result[key] = `${type}=${JSON.stringify(defaultValue)}`;
         }
-        result[key] = fieldInfo;
+        else if (required) {
+            result[key] = `${type}!`;
+        }
+        else {
+            result[key] = type;
+        }
     }
     return result;
 }

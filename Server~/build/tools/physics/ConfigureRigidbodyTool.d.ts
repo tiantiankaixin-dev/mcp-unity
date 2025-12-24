@@ -4,7 +4,7 @@ import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 export declare class ConfigureRigidbodyTool extends BaseTool {
     get name(): string;
     get description(): string;
-    get inputSchema(): z.ZodObject<{
+    get inputSchema(): z.ZodEffects<z.ZodObject<{
         instanceId: z.ZodOptional<z.ZodNumber>;
         gameObjectPath: z.ZodOptional<z.ZodString>;
         mass: z.ZodOptional<z.ZodNumber>;
@@ -31,6 +31,42 @@ export declare class ConfigureRigidbodyTool extends BaseTool {
         maxAngularVelocity: z.ZodOptional<z.ZodNumber>;
         sleepThreshold: z.ZodOptional<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
+        instanceId?: number | undefined;
+        gameObjectPath?: string | undefined;
+        mass?: number | undefined;
+        drag?: number | undefined;
+        useGravity?: boolean | undefined;
+        isKinematic?: boolean | undefined;
+        angularDrag?: number | undefined;
+        centerOfMass?: {
+            x: number;
+            y: number;
+            z: number;
+        } | undefined;
+        constraints?: ("None" | "FreezePositionX" | "FreezePositionY" | "FreezePositionZ" | "FreezeRotationX" | "FreezeRotationY" | "FreezeRotationZ" | "FreezePosition" | "FreezeRotation" | "FreezeAll")[] | undefined;
+        collisionDetectionMode?: "Discrete" | "Continuous" | "ContinuousDynamic" | "ContinuousSpeculative" | undefined;
+        interpolation?: "None" | "Interpolate" | "Extrapolate" | undefined;
+        maxAngularVelocity?: number | undefined;
+        sleepThreshold?: number | undefined;
+    }, {
+        instanceId?: number | undefined;
+        gameObjectPath?: string | undefined;
+        mass?: number | undefined;
+        drag?: number | undefined;
+        useGravity?: boolean | undefined;
+        isKinematic?: boolean | undefined;
+        angularDrag?: number | undefined;
+        centerOfMass?: {
+            x: number;
+            y: number;
+            z: number;
+        } | undefined;
+        constraints?: ("None" | "FreezePositionX" | "FreezePositionY" | "FreezePositionZ" | "FreezeRotationX" | "FreezeRotationY" | "FreezeRotationZ" | "FreezePosition" | "FreezeRotation" | "FreezeAll")[] | undefined;
+        collisionDetectionMode?: "Discrete" | "Continuous" | "ContinuousDynamic" | "ContinuousSpeculative" | undefined;
+        interpolation?: "None" | "Interpolate" | "Extrapolate" | undefined;
+        maxAngularVelocity?: number | undefined;
+        sleepThreshold?: number | undefined;
+    }>, {
         instanceId?: number | undefined;
         gameObjectPath?: string | undefined;
         mass?: number | undefined;

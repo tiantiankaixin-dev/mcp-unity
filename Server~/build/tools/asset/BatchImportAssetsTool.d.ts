@@ -9,6 +9,8 @@ import { BaseTool } from '../base/BaseTool.js';
  * Unity API: UnityEditor.AssetDatabase.ImportAsset
  * C# Handler: Editor/Tools/BatchImportAssetsTool.cs
  *
+ * Note: This can be a long-running operation depending on number and size of assets.
+ *
  * @see https://docs.unity3d.com/ScriptReference/AssetDatabase.ImportAsset.html
  *
  * @example

@@ -12,6 +12,7 @@ const CreateUIButtonToolArgsSchema = z.object({
     .optional()
     .default('Button')
     .describe('Text to display on the button. Default: "Button"'),
+  position: z.array(z.number()).length(2).optional().describe('Position as [x, y] in canvas space. Fallback to posX/posY if not provided'),
   posX: z
     .number()
     .optional()

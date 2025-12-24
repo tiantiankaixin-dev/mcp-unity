@@ -22,6 +22,8 @@ const AddForceToRigidbodyArgsSchema = z.object({
     z: z.number()
   }).optional().describe('Position in world coordinates (for ForceAtPosition)'),
   wakeUp: z.boolean().default(true).describe('Wake up the rigidbody if sleeping')
+}).refine(data => data.instanceId !== undefined || data.gameObjectPath, {
+  message: "Either 'instanceId' or 'gameObjectPath' is required"
 });
 
 @Tool({

@@ -12,17 +12,23 @@ export declare class CreateMaterialTool extends BaseTool {
         materialName: z.ZodDefault<z.ZodOptional<z.ZodString>>;
         savePath: z.ZodDefault<z.ZodOptional<z.ZodString>>;
         shaderName: z.ZodDefault<z.ZodOptional<z.ZodString>>;
-        color: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+        color: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodNumber, "many">>>;
+        metallic: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
+        smoothness: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     }, "strip", z.ZodTypeAny, {
         savePath: string;
-        color: string;
+        color: number[];
         materialName: string;
         shaderName: string;
+        metallic: number;
+        smoothness: number;
     }, {
         savePath?: string | undefined;
-        color?: string | undefined;
+        color?: number[] | undefined;
         materialName?: string | undefined;
         shaderName?: string | undefined;
+        metallic?: number | undefined;
+        smoothness?: number | undefined;
     }>;
     get category(): string;
     protected formatSuccessResponse(result: any): CallToolResult;

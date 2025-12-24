@@ -154,6 +154,12 @@ namespace McpUnity.Unity
         /// </summary>
         private IEnumerator ExecuteTool(McpToolBase tool, JObject parameters, TaskCompletionSource<JObject> tcs)
         {
+            // Wait for compilation to complete if in progress
+            while (UnityEditor.EditorApplication.isCompiling)
+            {
+                yield return null;
+            }
+
             try
             {
                 if (tool.IsAsync)
@@ -174,8 +180,6 @@ namespace McpUnity.Unity
                     "tool_execution_error"
                 ));
             }
-            
-            yield return null;
         }
         
         /// <summary>
@@ -183,6 +187,12 @@ namespace McpUnity.Unity
         /// </summary>
         private IEnumerator FetchResourceCoroutine(McpResourceBase resource, JObject parameters, TaskCompletionSource<JObject> tcs)
         {
+            // Wait for compilation to complete if in progress
+            while (UnityEditor.EditorApplication.isCompiling)
+            {
+                yield return null;
+            }
+
             try
             {
                 if (resource.IsAsync)
@@ -203,7 +213,6 @@ namespace McpUnity.Unity
                     "resource_fetch_error"
                 ));
             }
-            yield return null;
         }
         
         /// <summary>

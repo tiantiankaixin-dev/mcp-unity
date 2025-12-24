@@ -10,6 +10,7 @@ export declare class CreateGridLayoutGroupTool extends BaseTool {
     get description(): string;
     get inputSchema(): z.ZodObject<{
         panelName: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+        position: z.ZodOptional<z.ZodArray<z.ZodNumber, "many">>;
         posX: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         posY: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         width: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
@@ -26,7 +27,9 @@ export declare class CreateGridLayoutGroupTool extends BaseTool {
         panelName: string;
         cellWidth: number;
         cellHeight: number;
+        position?: number[] | undefined;
     }, {
+        position?: number[] | undefined;
         posX?: number | undefined;
         posY?: number | undefined;
         width?: number | undefined;

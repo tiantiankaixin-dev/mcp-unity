@@ -8,6 +8,7 @@ import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
  */
 const CreateReflectionProbeToolArgsSchema = z.object({
   probeName: z.string().optional().default('ReflectionProbe').describe('Name for the reflection probe GameObject. Default: "ReflectionProbe"'),
+  position: z.array(z.number()).length(3).optional().describe('Position as [x, y, z]. Fallback to posX/posY/posZ if not provided'),
   posX: z.number().optional().default(0).describe('X position. Default: 0'),
   posY: z.number().optional().default(1).describe('Y position. Default: 1'),
   posZ: z.number().optional().default(0).describe('Z position. Default: 0'),

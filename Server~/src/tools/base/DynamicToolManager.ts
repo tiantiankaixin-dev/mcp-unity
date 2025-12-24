@@ -3,6 +3,7 @@ import { McpUnity } from '../../unity/mcpUnity.js';
 import { Logger } from '../../utils/logger.js';
 import { BaseTool } from './BaseTool.js';
 import { ToolRegistry, ToolConstructor } from './ToolRegistry.js';
+import { z } from 'zod';
 
 /**
  * Registered tool instance with metadata
@@ -60,11 +61,44 @@ export class DynamicToolManager {
    */
   async discoverAndUseTool(toolName: string, params: any): Promise<any> {
     this.logger.info(`[Zero-Registration] Direct execution: ${toolName}`);
+    const rawParams = params ?? {};
+    const finalParams = this.normalizeParams(toolName, rawParams);
     
     // Verify tool exists in registry
     const ToolClass = ToolRegistry.getTool(toolName);
     if (!ToolClass) {
       throw new Error(`Tool '${toolName}' not found. Use read_resource('unity://tool-names/{category}') to see available tools.`);
+    }
+
+    // Prevent recursive/invalid calls: meta tools are MCP-side tools, not Unity Editor methods.
+    // They must be called directly as MCP tools, not via the Unity bridge.
+    const tempInstance = this.createTempInstance(ToolClass);
+    if (tempInstance.category === 'meta') {
+      throw new Error(
+        `Tool '${toolName}' is a meta MCP tool and cannot be executed via discover_and_use_tool. ` +
+        `Call '${toolName}' directly as an MCP tool instead (do not pass it as toolName).`
+      );
+    }
+    
+    // Check if this is a server-only tool (doesn't need Unity connection)
+    const metadata = (ToolClass as any).metadata;
+    if (metadata?.serverOnly === true) {
+      this.logger.info(`[Zero-Registration] Tool '${toolName}' is server-only, executing locally`);
+      try {
+        // Create a real tool instance and execute it locally
+        const toolInstance = new ToolClass(this.server, this.mcpUnity, this.logger);
+        const result = await (toolInstance as any).execute(finalParams);
+        return result;
+      } catch (error: any) {
+        this.logger.error(`[Zero-Registration] Server-only tool '${toolName}' execution failed:`, error);
+        return {
+          content: [{
+            type: 'text',
+            text: `❌ Error: ${error?.message || 'Unknown error'}`
+          }],
+          isError: true
+        };
+      }
     }
     
     try {
@@ -72,34 +106,28 @@ export class DynamicToolManager {
       // This bypasses the MCP layer entirely
       const result = await this.mcpUnity.sendRequest({
         method: toolName,
-        params: params
+        params: finalParams
       });
       
       this.logger.info(`[Zero-Registration] Tool '${toolName}' executed successfully`);
-      
-      // Get the tool's category for related tools hint
-      const ToolClass = ToolRegistry.getTool(toolName);
-      const category = ToolClass ? this.createTempInstance(ToolClass).category : 'unknown';
-      
-      // Build result with hint for AI to remember to explore more tools
-      // 确保result不是undefined或null
+
+      // Build result - return raw Unity response with workflow reminder
       const resultText = result?.message || (result ? JSON.stringify(result, null, 2) : 'Operation completed');
-      const hint = `\n\n💡 Tip: Need more tools? Query unity://tool-names/${category} for related tools, or unity://tool-categories for all categories.`;
-      
+      const workflowHint = `\n📖 unity_tool_discovery`;
+
       return {
         content: [{
           type: 'text',
-          text: resultText + hint
+          text: resultText + workflowHint
         }]
       };
     } catch (error: any) {
       this.logger.error(`[Zero-Registration] Tool '${toolName}' execution failed:`, error);
-      // 确保正确获取错误消息
       const errorMessage = error?.message || (typeof error === 'string' ? error : JSON.stringify(error) || 'Unknown error');
       return {
         content: [{
           type: 'text',
-          text: `❌ Error: ${errorMessage}`
+          text: `❌ Error: ${errorMessage}\n\n💡 If parameter error, use read_resource('unity://tool/${toolName}') to check correct params.`
         }],
         isError: true
       };
@@ -113,17 +141,42 @@ export class DynamicToolManager {
    */
   async discoverAndUseToolRaw(toolName: string, params: any): Promise<any> {
     this.logger.info(`[Chain] Raw execution: ${toolName}`);
+    const rawParams = params ?? {};
+    const finalParams = this.normalizeParams(toolName, rawParams);
     
     // Verify tool exists in registry
     const ToolClass = ToolRegistry.getTool(toolName);
     if (!ToolClass) {
       throw new Error(`Tool '${toolName}' not found in registry.`);
     }
+
+    // Same protection for chaining: meta tools are MCP-side tools, not Unity Editor methods.
+    const tempInstance = this.createTempInstance(ToolClass);
+    if (tempInstance.category === 'meta') {
+      throw new Error(
+        `Tool '${toolName}' is a meta MCP tool and cannot be executed via discover_and_use_batch. ` +
+        `Call '${toolName}' directly as an MCP tool instead (do not include it inside the batch tools list).`
+      );
+    }
+    
+    // Check if this is a server-only tool (doesn't need Unity connection)
+    const metadata = (ToolClass as any).metadata;
+    if (metadata?.serverOnly === true) {
+      this.logger.info(`[Chain] Tool '${toolName}' is server-only, executing locally`);
+      // Create a real tool instance and execute it locally
+      const toolInstance = new ToolClass(this.server, this.mcpUnity, this.logger);
+      const result = await (toolInstance as any).execute(finalParams);
+      // Extract the text content from CallToolResult format
+      if (result?.content?.[0]?.text) {
+        return { success: true, message: result.content[0].text };
+      }
+      return result;
+    }
     
     // Directly send request to Unity and return raw result
     const result = await this.mcpUnity.sendRequest({
       method: toolName,
-      params: params
+      params: finalParams
     });
     
     this.logger.info(`[Chain] Tool '${toolName}' executed, raw result returned`);
@@ -397,6 +450,62 @@ export class DynamicToolManager {
     } as unknown as Logger;
     
     return new ToolClass(mockServer, mockMcpUnity, mockLogger);
+  }
+
+  /**
+   * Normalize parameter names from snake_case to camelCase based on tool schema
+   * This allows AI to use either format without errors
+   */
+  private normalizeParams(toolName: string, params: Record<string, any>): Record<string, any> {
+    if (!params || Object.keys(params).length === 0) {
+      return params;
+    }
+
+    const ToolClass = ToolRegistry.getTool(toolName);
+    if (!ToolClass) {
+      return params;
+    }
+
+    try {
+      const tempInstance = this.createTempInstance(ToolClass);
+      const schema = tempInstance.inputSchema;
+      
+      if (!schema || !(schema instanceof z.ZodObject)) {
+        return params;
+      }
+
+      const schemaShape = schema.shape;
+      const schemaKeys = Object.keys(schemaShape);
+      const schemaKeysLower = schemaKeys.map(k => k.toLowerCase());
+      
+      const normalized: Record<string, any> = {};
+      
+      for (const [key, value] of Object.entries(params)) {
+        const snakeToCamel = key.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+        
+        if (schemaKeys.includes(key)) {
+          normalized[key] = value;
+        } else if (schemaKeys.includes(snakeToCamel)) {
+          this.logger.debug(`[Normalize] ${toolName}: ${key} → ${snakeToCamel}`);
+          normalized[snakeToCamel] = value;
+        } else {
+          const lowerKey = key.toLowerCase();
+          const matchIdx = schemaKeysLower.indexOf(lowerKey);
+          if (matchIdx >= 0) {
+            const correctKey = schemaKeys[matchIdx];
+            this.logger.debug(`[Normalize] ${toolName}: ${key} → ${correctKey}`);
+            normalized[correctKey] = value;
+          } else {
+            normalized[key] = value;
+          }
+        }
+      }
+      
+      return normalized;
+    } catch (error) {
+      this.logger.warn(`[Normalize] Failed for ${toolName}, using original params`);
+      return params;
+    }
   }
   
   /**

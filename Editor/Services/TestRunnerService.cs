@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using McpUnity.Unity;
 using McpUnity.Utils;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEditor.TestTools.TestRunner.Api;
 using Newtonsoft.Json.Linq;
 
@@ -73,6 +75,23 @@ namespace McpUnity.Services
         /// <returns>Task that resolves with test results when tests are complete</returns>
         public async Task<JObject> ExecuteTestsAsync(TestMode testMode, bool returnOnlyFailures, bool returnWithLogs, string testFilter = "")
         {
+            // 先静默保存所有已修改的场景，避免弹出保存对话框阻塞测试
+            for (int i = 0; i < SceneManager.sceneCount; i++)
+            {
+                var scene = SceneManager.GetSceneAt(i);
+                if (scene.isDirty && !string.IsNullOrEmpty(scene.path))
+                {
+                    EditorSceneManager.SaveScene(scene);
+                }
+            }
+            
+            // Set flag to prevent server from stopping during PlayMode tests
+            if (testMode == TestMode.PlayMode)
+            {
+                McpUnityServer.Instance.IsRunningTests = true;
+                McpLogger.LogInfo("PlayMode tests starting - server will stay running during test execution");
+            }
+            
             var filter = new Filter { testMode = testMode };
 
             _tcs = new TaskCompletionSource<JObject>();
@@ -86,8 +105,13 @@ namespace McpUnity.Services
 
             _testRunnerApi.Execute(new ExecutionSettings(filter));
 
-            return await WaitForCompletionAsync(
+            var result = await WaitForCompletionAsync(
                 McpUnitySettings.Instance.RequestTimeoutSeconds);
+            
+            // Reset flag after tests complete
+            McpUnityServer.Instance.IsRunningTests = false;
+            
+            return result;
         }
         
         /// <summary>

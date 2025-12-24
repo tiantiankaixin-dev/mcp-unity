@@ -62,7 +62,7 @@ const UpdateComponentToolArgsSchema = z.object({
 let UpdateComponentTool = (() => {
     let _classDecorators = [Tool({
             name: 'update_component',
-            description: 'Updates component properties',
+            description: 'Updates component properties. Params: instanceId or objectPath, componentName (e.g. "Transform"), componentData (e.g. {localScale:{x:10,y:10,z:10}})',
             category: 'component',
             version: '1.0.0'
         }), Tags(['unity', 'component', 'update'])];
@@ -83,7 +83,7 @@ let UpdateComponentTool = (() => {
             return 'update_component';
         }
         get description() {
-            return 'Updates component properties';
+            return 'Updates component properties. Params: instanceId or objectPath, componentName (e.g. "Transform"), componentData (e.g. {localScale:{x:10,y:10,z:10}})';
         }
         get inputSchema() {
             return UpdateComponentToolArgsSchema;

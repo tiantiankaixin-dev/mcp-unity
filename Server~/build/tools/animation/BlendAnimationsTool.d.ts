@@ -94,11 +94,11 @@ export declare class BlendAnimationsTool extends BaseTool {
             threshold?: number | undefined;
             timeScale?: number | undefined;
         }[];
-        layerIndex?: number | undefined;
         position?: {
             x: number;
             y: number;
         } | undefined;
+        layerIndex?: number | undefined;
         isDefaultState?: boolean | undefined;
         parameter?: string | undefined;
         parameterX?: string | undefined;

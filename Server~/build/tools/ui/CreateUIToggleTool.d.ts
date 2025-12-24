@@ -10,6 +10,7 @@ export declare class CreateUIToggleTool extends BaseTool {
     get description(): string;
     get inputSchema(): z.ZodObject<{
         toggleName: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+        position: z.ZodOptional<z.ZodArray<z.ZodNumber, "many">>;
         posX: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         posY: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         labelText: z.ZodDefault<z.ZodOptional<z.ZodString>>;
@@ -20,7 +21,9 @@ export declare class CreateUIToggleTool extends BaseTool {
         toggleName: string;
         labelText: string;
         isOn: boolean;
+        position?: number[] | undefined;
     }, {
+        position?: number[] | undefined;
         posX?: number | undefined;
         posY?: number | undefined;
         toggleName?: string | undefined;

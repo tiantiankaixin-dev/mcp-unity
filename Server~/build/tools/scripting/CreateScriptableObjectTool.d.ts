@@ -31,13 +31,13 @@ export declare class CreateScriptableObjectTool extends BaseTool {
         savePath: z.ZodOptional<z.ZodString>;
         typeName: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
-        typeName?: string | undefined;
         savePath?: string | undefined;
         assetName?: string | undefined;
+        typeName?: string | undefined;
     }, {
-        typeName?: string | undefined;
         savePath?: string | undefined;
         assetName?: string | undefined;
+        typeName?: string | undefined;
     }>;
     /**
      * Execution logic for creating ScriptableObject assets

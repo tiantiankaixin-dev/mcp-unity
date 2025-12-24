@@ -8,6 +8,7 @@ import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
  */
 const CreateUIDropdownToolArgsSchema = z.object({
   dropdownName: z.string().optional().default('Dropdown').describe('Name for the Dropdown GameObject. Default: "Dropdown"'),
+  position: z.array(z.number()).length(3).optional().describe('Position as [x, y, z]. Fallback to posX/posY/posZ if not provided'),
   posX: z.number().optional().default(0).describe('X position in canvas space. Default: 0'),
   posY: z.number().optional().default(0).describe('Y position in canvas space. Default: 0'),
   width: z.number().optional().default(160).describe('Width of the dropdown. Default: 160'),

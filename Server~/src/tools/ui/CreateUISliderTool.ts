@@ -8,6 +8,7 @@ import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
  */
 const CreateUISliderToolArgsSchema = z.object({
   sliderName: z.string().optional().default('Slider').describe('Name for the Slider GameObject. Default: "Slider"'),
+  position: z.array(z.number()).length(3).optional().describe('Position as [x, y, z]. Fallback to posX/posY/posZ if not provided'),
   posX: z.number().optional().default(0).describe('X position in canvas space. Default: 0'),
   posY: z.number().optional().default(0).describe('Y position in canvas space. Default: 0'),
   minValue: z.number().optional().default(0).describe('Minimum slider value. Default: 0'),

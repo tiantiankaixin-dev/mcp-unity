@@ -40,7 +40,7 @@ import { Tool, Tags } from '../base/ToolDecorators.js';
  */
 const ChangeMaterialColorToolArgsSchema = z.object({
     instanceIds: z.array(z.number().int()).min(1).describe('Array of GameObject instance IDs to change material color'),
-    color: z.string().optional().default('#FFFFFF').describe('Color in hex format. Example: "#FF0000". Default: "#FFFFFF"'),
+    color: z.array(z.number()).length(4).optional().default([1, 1, 1, 1]).describe('Color as RGBA [r,g,b,a] (0-1). Default: [1,1,1,1]'),
     propertyName: z.string().optional().default('_Color').describe('Material property name. Default: "_Color"')
 });
 /**
@@ -50,7 +50,7 @@ const ChangeMaterialColorToolArgsSchema = z.object({
 let ChangeMaterialColorTool = (() => {
     let _classDecorators = [Tool({
             name: 'change_material_color',
-            description: 'Changes material color',
+            description: 'Changes material color. Params: instanceIds (array), color ([r,g,b,a] 0-1, e.g. [1,0,0,1] for red)',
             category: 'material',
             version: '1.0.0'
         }), Tags(['unity', 'material', 'color'])];
@@ -71,7 +71,7 @@ let ChangeMaterialColorTool = (() => {
             return 'change_material_color';
         }
         get description() {
-            return 'Changes material color';
+            return 'Changes material color. Params: instanceIds (array), color ([r,g,b,a] 0-1, e.g. [1,0,0,1] for red)';
         }
         get inputSchema() {
             return ChangeMaterialColorToolArgsSchema;

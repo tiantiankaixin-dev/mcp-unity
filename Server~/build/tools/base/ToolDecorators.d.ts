@@ -126,3 +126,18 @@ export declare function Async(): <T extends ToolConstructor>(constructor: T) => 
  * ```
  */
 export declare function Author(name: string, email?: string): <T extends ToolConstructor>(constructor: T) => T;
+/**
+ * Decorator to mark a tool as server-only (does not require Unity connection)
+ * Server-only tools execute entirely on the MCP server without sending requests to Unity.
+ * Use this for tools that work with local data, statistics, or server-side operations.
+ *
+ * @example
+ * ```typescript
+ * @ServerOnly()
+ * @Tool({ name: 'check_workflow_status', category: 'debug' })
+ * export class CheckWorkflowStatusTool extends BaseTool {
+ *   // Implementation that doesn't need Unity...
+ * }
+ * ```
+ */
+export declare function ServerOnly(): <T extends ToolConstructor>(constructor: T) => T;

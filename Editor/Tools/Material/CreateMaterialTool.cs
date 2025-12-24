@@ -24,7 +24,40 @@ namespace McpUnity.Tools
                 string materialName = parameters["materialName"]?.ToObject<string>() ?? "NewMaterial";
                 string savePath = parameters["savePath"]?.ToObject<string>() ?? "Assets/Materials";
                 string shaderName = parameters["shaderName"]?.ToObject<string>() ?? "Standard";
-                string colorHex = parameters["color"]?.ToObject<string>() ?? "#FFFFFF";
+
+                // ✅ 支持两种颜色格式
+                Color color = Color.white;
+                if (parameters["color"] != null)
+                {
+                    var colorToken = parameters["color"];
+                    if (colorToken.Type == JTokenType.Array)
+                    {
+                        // 数组格式: color: [r, g, b, a] (0-1 范围)
+                        var rgba = colorToken.ToObject<float[]>();
+                        if (rgba.Length >= 3)
+                        {
+                            color = new Color(
+                                rgba[0],
+                                rgba[1],
+                                rgba[2],
+                                rgba.Length > 3 ? rgba[3] : 1f
+                            );
+                        }
+                    }
+                    else if (colorToken.Type == JTokenType.String)
+                    {
+                        // 字符串格式: color: "#FF0000"
+                        string colorHex = colorToken.ToObject<string>();
+                        if (!ColorUtility.TryParseHtmlString(colorHex, out color))
+                        {
+                            color = Color.white;
+                        }
+                    }
+                }
+
+                // 获取 metallic 和 smoothness 参数
+                float metallic = parameters["metallic"]?.ToObject<float>() ?? 0f;
+                float smoothness = parameters["smoothness"]?.ToObject<float>() ?? 0.5f;
 
                 // 确保保存路径存在 (自动补全 Assets/ 前缀)
                 savePath = McpUtils.EnsureFolderExists(savePath);
@@ -39,11 +72,21 @@ namespace McpUnity.Tools
                 material.name = materialName;
 
                 // 设置颜色
-                if (ColorUtility.TryParseHtmlString(colorHex, out Color color))
+                if (material.HasProperty("_Color"))
                 {
-                    if (material.HasProperty("_Color"))
+                    material.SetColor("_Color", color);
+                }
+
+                // 设置 metallic 和 smoothness (仅对 Standard shader)
+                if (shaderName == "Standard" || shader.name == "Standard")
+                {
+                    if (material.HasProperty("_Metallic"))
                     {
-                        material.SetColor("_Color", color);
+                        material.SetFloat("_Metallic", Mathf.Clamp01(metallic));
+                    }
+                    if (material.HasProperty("_Glossiness"))
+                    {
+                        material.SetFloat("_Glossiness", Mathf.Clamp01(smoothness));
                     }
                 }
 

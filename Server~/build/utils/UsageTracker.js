@@ -99,7 +99,7 @@ export class UsageTracker {
         const now = Date.now();
         // ✅ Special handling: meta tools (discover_and_use_batch, discover_and_use_tool) skip workflow check
         // These tools are designed for chained execution and should not be blocked
-        const metaTools = ['discover_and_use_batch', 'discover_and_use_tool'];
+        const metaTools = ['discover_and_use_batch', 'discover_and_use_tool', 'list_categories', 'get_tool_names', 'get_tool_schemas'];
         if (metaTools.includes(toolName)) {
             this.logger?.debug(`Meta tool '${toolName}' - skipping workflow check`);
             return { allowed: true };

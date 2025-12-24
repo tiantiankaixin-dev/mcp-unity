@@ -42,11 +42,12 @@ const CreatePrimitiveObjectToolArgsSchema = z.object({
     primitiveType: z
         .enum(['cube', 'sphere', 'capsule', 'cylinder', 'plane', 'quad'])
         .default('cube')
-        .describe('Type of primitive to create. Options: cube, sphere, capsule, cylinder, plane, quad. Default: cube'),
+        .describe('Type of primitive (lowercase). Options: cube, sphere, capsule, cylinder, plane, quad. Default: cube'),
     objectName: z
         .string()
         .optional()
-        .describe('Optional name for the created GameObject. If not provided, Unity default name will be used'),
+        .describe('Optional name for the GameObject. If not provided, Unity default name will be used'),
+    position: z.array(z.number()).length(3).optional().describe('Position as [x, y, z]. Fallback to posX/posY/posZ if not provided'),
     posX: z
         .number()
         .optional()
@@ -70,7 +71,7 @@ const CreatePrimitiveObjectToolArgsSchema = z.object({
 let CreatePrimitiveObjectTool = (() => {
     let _classDecorators = [Tool({
             name: 'create_primitive_object',
-            description: 'Creates primitive GameObject (Cube, Sphere, etc.)',
+            description: 'Creates primitive (cube/sphere/capsule/cylinder/plane/quad). No scale param - use update_component with Transform.localScale after creation.',
             category: 'gameobject',
             version: '1.0.0'
         }), Tags(['unity', 'gameobject', 'primitive', 'creation'])];
@@ -91,7 +92,7 @@ let CreatePrimitiveObjectTool = (() => {
             return 'create_primitive_object';
         }
         get description() {
-            return 'Creates primitive GameObject (Cube, Sphere, etc.)';
+            return 'Creates primitive (cube/sphere/capsule/cylinder/plane/quad). No scale param - use update_component with Transform.localScale after creation.';
         }
         get inputSchema() {
             return CreatePrimitiveObjectToolArgsSchema;

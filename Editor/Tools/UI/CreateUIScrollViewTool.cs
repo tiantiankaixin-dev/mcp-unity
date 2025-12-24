@@ -22,8 +22,37 @@ namespace McpUnity.Tools
             try
             {
                 string scrollViewName = parameters["scrollViewName"]?.ToObject<string>() ?? "ScrollView";
-                float posX = parameters["posX"]?.ToObject<float>() ?? 0f;
-                float posY = parameters["posY"]?.ToObject<float>() ?? 0f;
+                // ✅ 支持两种位置格式 (2D UI)
+
+                float posX = 0f, posY = 0f;
+
+                if (parameters["position"] != null && parameters["position"].Type == JTokenType.Array)
+
+                {
+
+                    var pos = parameters["position"].ToObject<float[]>();
+
+                    if (pos.Length >= 2)
+
+                    {
+
+                        posX = pos[0];
+
+                        posY = pos[1];
+
+                    }
+
+                }
+
+                else
+
+                {
+
+                    posX = parameters["posX"]?.ToObject<float>() ?? 0f;
+
+                    posY = parameters["posY"]?.ToObject<float>() ?? 0f;
+
+                }
                 float width = parameters["width"]?.ToObject<float>() ?? 300f;
                 float height = parameters["height"]?.ToObject<float>() ?? 200f;
 

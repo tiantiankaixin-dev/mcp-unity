@@ -53,8 +53,7 @@ const DiscoverAndUseBatchArgsSchema = z.object({
     tools: z
         .array(ToolCallSchema)
         .min(1)
-        .max(20)
-        .describe('Array of tools to execute in sequence (max 20). Use params_mapping with $.{index}.field to chain outputs.')
+        .describe('Array of tools to execute in sequence (no limit). Use params_mapping with $.{index}.field to chain outputs.')
 });
 /**
  * DiscoverAndUseBatchTool - Execute multiple Unity tools in sequence with parameter chaining
@@ -100,7 +99,7 @@ const DiscoverAndUseBatchArgsSchema = z.object({
 let DiscoverAndUseBatchTool = (() => {
     let _classDecorators = [Tool({
             name: 'discover_and_use_batch',
-            description: '🚀 PREFERRED! Execute multiple Unity tools in ONE call. Chain with $.{index}.field. 🔴 MUST READ FIRST: Use read_resource("unity://tool-names/{category}") to get exact tool names before calling. DO NOT guess tool names! 📖 unity_tool_discovery 📖 unity_tool_discovery',
+            description: '🚀 PREFERRED! 📋 STEP 3: Execute multiple Unity tools in ONE call. Chain outputs with $.{index}.field syntax.',
             category: 'meta',
             version: '2.0.0'
         })];
@@ -121,7 +120,7 @@ let DiscoverAndUseBatchTool = (() => {
             return 'discover_and_use_batch';
         }
         get description() {
-            return '🚀 PREFERRED! Execute multiple Unity tools in ONE call. Chain with $.{index}.field. 🔴 MUST READ FIRST: Use read_resource("unity://tool-names/{category}") to get exact tool names before calling. DO NOT guess tool names! 📖 unity_tool_discovery 📖 unity_tool_discovery';
+            return '🚀 PREFERRED! 📋 STEP 3: Execute multiple Unity tools in ONE call. Chain outputs with $.{index}.field syntax.';
         }
         get inputSchema() {
             return DiscoverAndUseBatchArgsSchema;
@@ -174,6 +173,7 @@ let DiscoverAndUseBatchTool = (() => {
                     if (errorMessage.includes('GameObject required') || errorMessage.includes('instanceIds')) {
                         errorMessage += '\n💡 Hint: instanceIds requires ARRAY format: ["$.0.instanceId"] not "$.0.instanceId"';
                     }
+                    errorMessage += `\n💡 If parameter error, use read_resource('unity://tool/${toolName}') to check correct params.`;
                     results.push({
                         index: i,
                         toolName,
@@ -213,7 +213,7 @@ let DiscoverAndUseBatchTool = (() => {
             return {
                 content: [{
                         type: 'text',
-                        text: summary + detailsText
+                        text: summary + detailsText + '\n📖 unity_tool_discovery'
                     }],
                 isError: failureCount > 0
             };

@@ -10,6 +10,7 @@ export declare class CreatePrimitiveObjectTool extends GameObjectCreationTool {
     get inputSchema(): z.ZodObject<{
         primitiveType: z.ZodDefault<z.ZodEnum<["cube", "sphere", "capsule", "cylinder", "plane", "quad"]>>;
         objectName: z.ZodOptional<z.ZodString>;
+        position: z.ZodOptional<z.ZodArray<z.ZodNumber, "many">>;
         posX: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         posY: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         posZ: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
@@ -18,8 +19,10 @@ export declare class CreatePrimitiveObjectTool extends GameObjectCreationTool {
         posY: number;
         posZ: number;
         primitiveType: "cube" | "sphere" | "capsule" | "cylinder" | "plane" | "quad";
+        position?: number[] | undefined;
         objectName?: string | undefined;
     }, {
+        position?: number[] | undefined;
         posX?: number | undefined;
         posY?: number | undefined;
         posZ?: number | undefined;

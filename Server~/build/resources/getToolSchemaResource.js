@@ -20,7 +20,7 @@ export function registerGetToolSchemaResource(server, logger) {
     });
     // Register this templated resource with the MCP server
     server.resource(resourceName, resourceTemplate, {
-        description: 'Get detailed schema for a SINGLE tool by name. More efficient than loading entire category when you only need 1-2 tools.',
+        description: 'Get detailed parameter schema for a tool. Use this only if tool execution fails due to parameter errors.',
         mimeType: resourceMimeType
     }, async (uri, variables) => {
         try {

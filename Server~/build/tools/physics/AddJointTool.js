@@ -74,6 +74,8 @@ const AddJointArgsSchema = z.object({
         angularYMotion: ConfigurableJointMotionSchema.optional(),
         angularZMotion: ConfigurableJointMotionSchema.optional()
     }).optional()
+}).refine(data => data.instanceId !== undefined || data.gameObjectPath, {
+    message: "Either 'instanceId' or 'gameObjectPath' is required"
 });
 let AddJointTool = (() => {
     let _classDecorators = [Tool({

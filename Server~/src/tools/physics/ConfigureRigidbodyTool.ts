@@ -27,6 +27,8 @@ const ConfigureRigidbodyArgsSchema = z.object({
   interpolation: z.enum(['None', 'Interpolate', 'Extrapolate']).optional(),
   maxAngularVelocity: z.number().positive().optional(),
   sleepThreshold: z.number().min(0).optional()
+}).refine(data => data.instanceId !== undefined || data.gameObjectPath, {
+  message: "Either 'instanceId' or 'gameObjectPath' is required"
 });
 
 @Tool({

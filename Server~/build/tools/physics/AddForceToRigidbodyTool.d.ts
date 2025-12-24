@@ -4,7 +4,7 @@ import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 export declare class AddForceToRigidbodyTool extends BaseTool {
     get name(): string;
     get description(): string;
-    get inputSchema(): z.ZodObject<{
+    get inputSchema(): z.ZodEffects<z.ZodObject<{
         instanceId: z.ZodOptional<z.ZodNumber>;
         gameObjectPath: z.ZodOptional<z.ZodString>;
         force: z.ZodObject<{
@@ -45,12 +45,12 @@ export declare class AddForceToRigidbodyTool extends BaseTool {
         forceMode: "Force" | "Acceleration" | "Impulse" | "VelocityChange";
         forceType: "Force" | "RelativeForce" | "Torque" | "RelativeTorque";
         wakeUp: boolean;
-        instanceId?: number | undefined;
         position?: {
             x: number;
             y: number;
             z: number;
         } | undefined;
+        instanceId?: number | undefined;
         gameObjectPath?: string | undefined;
     }, {
         force: {
@@ -58,12 +58,44 @@ export declare class AddForceToRigidbodyTool extends BaseTool {
             y: number;
             z: number;
         };
-        instanceId?: number | undefined;
         position?: {
             x: number;
             y: number;
             z: number;
         } | undefined;
+        instanceId?: number | undefined;
+        gameObjectPath?: string | undefined;
+        forceMode?: "Force" | "Acceleration" | "Impulse" | "VelocityChange" | undefined;
+        forceType?: "Force" | "RelativeForce" | "Torque" | "RelativeTorque" | undefined;
+        wakeUp?: boolean | undefined;
+    }>, {
+        force: {
+            x: number;
+            y: number;
+            z: number;
+        };
+        forceMode: "Force" | "Acceleration" | "Impulse" | "VelocityChange";
+        forceType: "Force" | "RelativeForce" | "Torque" | "RelativeTorque";
+        wakeUp: boolean;
+        position?: {
+            x: number;
+            y: number;
+            z: number;
+        } | undefined;
+        instanceId?: number | undefined;
+        gameObjectPath?: string | undefined;
+    }, {
+        force: {
+            x: number;
+            y: number;
+            z: number;
+        };
+        position?: {
+            x: number;
+            y: number;
+            z: number;
+        } | undefined;
+        instanceId?: number | undefined;
         gameObjectPath?: string | undefined;
         forceMode?: "Force" | "Acceleration" | "Impulse" | "VelocityChange" | undefined;
         forceType?: "Force" | "RelativeForce" | "Torque" | "RelativeTorque" | undefined;

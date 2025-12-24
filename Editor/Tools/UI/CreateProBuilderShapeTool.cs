@@ -22,8 +22,37 @@ namespace McpUnity.Tools
             {
                 string shapeName = parameters["shapeName"]?.ToObject<string>() ?? "ProBuilderShape";
                 string shapeType = parameters["shapeType"]?.ToObject<string>()?.ToLower() ?? "cube";
-                float posX = parameters["posX"]?.ToObject<float>() ?? 0f;
-                float posY = parameters["posY"]?.ToObject<float>() ?? 0f;
+                // ✅ 支持两种位置格式 (2D UI)
+
+                float posX = 0f, posY = 0f;
+
+                if (parameters["position"] != null && parameters["position"].Type == JTokenType.Array)
+
+                {
+
+                    var pos = parameters["position"].ToObject<float[]>();
+
+                    if (pos.Length >= 2)
+
+                    {
+
+                        posX = pos[0];
+
+                        posY = pos[1];
+
+                    }
+
+                }
+
+                else
+
+                {
+
+                    posX = parameters["posX"]?.ToObject<float>() ?? 0f;
+
+                    posY = parameters["posY"]?.ToObject<float>() ?? 0f;
+
+                }
                 float posZ = parameters["posZ"]?.ToObject<float>() ?? 0f;
                 float size = parameters["size"]?.ToObject<float>() ?? 1f;
 

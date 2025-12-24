@@ -65,7 +65,7 @@ const UpdateGameObjectToolArgsSchema = z.object({
 let UpdateGameObjectTool = (() => {
     let _classDecorators = [Tool({
             name: 'update_gameobject',
-            description: 'Updates GameObject properties',
+            description: 'Updates GameObject metadata (name/tag/layer/active/static). NOT for Transform - use update_component instead.',
             category: 'gameobject',
             version: '1.0.0'
         }), Tags(['unity', 'gameobject', 'update'])];
@@ -86,7 +86,7 @@ let UpdateGameObjectTool = (() => {
             return 'update_gameobject';
         }
         get description() {
-            return 'Updates GameObject properties';
+            return 'Updates GameObject metadata (name/tag/layer/active/static). NOT for Transform - use update_component instead.';
         }
         get inputSchema() {
             return UpdateGameObjectToolArgsSchema;

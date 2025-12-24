@@ -13,14 +13,14 @@ const SetParentToolArgsSchema = z.object({
 
 @Tool({
   name: 'set_parent',
-  description: 'Set the parent of GameObjects. Use null/0 to unparent (move to root).',
+  description: 'Set parent of GameObjects. Params: childInstanceId or instanceIds[], parentInstanceId (0 to unparent)',
   category: 'gameobject',
   version: '1.0.0'
 })
 @Tags(['unity', 'gameobject', 'parent', 'hierarchy'])
 export class SetParentTool extends BaseTool {
   get name() { return 'set_parent'; }
-  get description() { return 'Set the parent of GameObjects. Use null/0 to unparent (move to root).'; }
+  get description() { return 'Set parent of GameObjects. Params: childInstanceId or instanceIds[], parentInstanceId (0 to unparent)'; }
   get inputSchema() { return SetParentToolArgsSchema; }
   get category() { return 'gameobject'; }
 }

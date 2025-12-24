@@ -40,6 +40,7 @@ import { Tool, Tags } from '../base/ToolDecorators.js';
  */
 const CreateParticleSystemToolArgsSchema = z.object({
     particleName: z.string().optional().default('ParticleSystem').describe('Name for the particle system GameObject. Default: "ParticleSystem"'),
+    position: z.array(z.number()).length(3).optional().describe('Position as [x, y, z]. Fallback to posX/posY/posZ if not provided'),
     posX: z.number().optional().default(0).describe('X position. Default: 0'),
     posY: z.number().optional().default(0).describe('Y position. Default: 0'),
     posZ: z.number().optional().default(0).describe('Z position. Default: 0'),

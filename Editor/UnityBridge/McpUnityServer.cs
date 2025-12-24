@@ -34,13 +34,24 @@ namespace McpUnity.Unity
         private Process _mcpWebSocketProcess;
         
         /// <summary>
+        /// Flag to indicate if tests are currently running
+        /// When true, server will not stop during PlayMode state changes
+        /// </summary>
+        public bool IsRunningTests { get; set; } = false;
+        
+        /// <summary>
         /// Called after every domain reload
+        /// Uses EditorApplication.delayCall to avoid blocking the domain reload process
         /// </summary>
         [DidReloadScripts]
         private static void AfterReload()
         {
-            // Ensure Instance is created and hooks are set up after initial domain load
-            var currentInstance = Instance;
+            // Delay initialization to next frame to avoid blocking domain reload
+            EditorApplication.delayCall += () =>
+            {
+                // Ensure Instance is created and hooks are set up after initial domain load
+                var currentInstance = Instance;
+            };
         }
         
         /// <summary>
@@ -126,7 +137,16 @@ namespace McpUnity.Unity
             EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
 
-            InstallServer();
+            // Only install server if auto-install is enabled
+            if (McpUnitySettings.Instance.AutoInstallDependencies)
+            {
+                InstallServer();
+            }
+            else
+            {
+                McpLogger.LogInfo("[MCP Unity] Auto-install dependencies is disabled. Server installation skipped.");
+            }
+
             InitializeServices();
             RegisterResources();
             RegisterTools();
@@ -346,7 +366,8 @@ namespace McpUnity.Unity
         }
 
         /// <summary>
-        /// Find Node.js executable
+        /// Find Node.js executable with timeout protection
+        /// Uses shorter timeout (500ms) per path to avoid long blocking
         /// </summary>
         private string FindNodeExecutable()
         {
@@ -370,28 +391,49 @@ namespace McpUnity.Unity
                         Arguments = "--version",
                         UseShellExecute = false,
                         CreateNoWindow = true,
-                        RedirectStandardOutput = true
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true
                     };
 
                     using (Process testProcess = Process.Start(testInfo))
                     {
                         if (testProcess != null)
                         {
-                            testProcess.WaitForExit(1000);
+                            // Reduced timeout from 1000ms to 500ms to minimize blocking
+                            bool exited = testProcess.WaitForExit(500);
+                            
+                            if (!exited)
+                            {
+                                // Kill the process if it didn't exit in time
+                                try { testProcess.Kill(); } catch { }
+                                continue;
+                            }
+                            
                             if (testProcess.ExitCode == 0)
                             {
+                                McpLogger.LogInfo($"[MCP Unity] Found Node.js at: {path}");
                                 return path;
                             }
                         }
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // Continue to next path
+                    // Log but continue to next path
+                    McpLogger.LogInfo($"[MCP Unity] Failed to test Node.js path '{path}': {ex.Message}");
                 }
             }
 
+            McpLogger.LogWarning("[MCP Unity] Node.js executable not found in common locations.");
             return null;
+        }
+
+        /// <summary>
+        /// Get all registered tools (read-only access for resources)
+        /// </summary>
+        public IReadOnlyDictionary<string, McpToolBase> GetAllTools()
+        {
+            return _tools;
         }
 
         /// <summary>
@@ -413,6 +455,7 @@ namespace McpUnity.Unity
         /// <summary>
         /// Installs the MCP Node.js server by running 'npm install' and 'npm run build'
         /// in the server directory if 'node_modules' or 'build' folders are missing.
+        /// Now runs asynchronously to avoid blocking the Unity Editor main thread.
         /// </summary>
         public void InstallServer()
         {
@@ -425,15 +468,47 @@ namespace McpUnity.Unity
             }
 
             string nodeModulesPath = Path.Combine(serverPath, "node_modules");
-            if (!Directory.Exists(nodeModulesPath))
+            string buildPath = Path.Combine(serverPath, "build");
+            
+            bool needsInstall = !Directory.Exists(nodeModulesPath);
+            bool needsBuild = !Directory.Exists(buildPath);
+
+            if (!needsInstall && !needsBuild)
             {
-                McpUtils.RunNpmCommand("install", serverPath);
+                McpLogger.LogInfo("[MCP Unity] Server already installed and built.");
+                return;
             }
 
-            string buildPath = Path.Combine(serverPath, "build");
-            if (!Directory.Exists(buildPath))
+            int timeout = McpUnitySettings.Instance.NpmInstallTimeoutSeconds;
+
+            if (needsInstall)
             {
-                McpUtils.RunNpmCommand("run build", serverPath);
+                McpLogger.LogInfo($"[MCP Unity] Starting npm install in background (timeout: {timeout}s)...");
+                McpUtils.RunNpmCommandAsync("install", serverPath, timeout, (success, message) =>
+                {
+                    if (success && needsBuild)
+                    {
+                        McpLogger.LogInfo($"[MCP Unity] Starting npm build in background (timeout: {timeout}s)...");
+                        McpUtils.RunNpmCommandAsync("run build", serverPath, timeout, (buildSuccess, buildMessage) =>
+                        {
+                            if (buildSuccess)
+                            {
+                                McpLogger.LogInfo("[MCP Unity] Server installation and build completed successfully.");
+                            }
+                        });
+                    }
+                });
+            }
+            else if (needsBuild)
+            {
+                McpLogger.LogInfo($"[MCP Unity] Starting npm build in background (timeout: {timeout}s)...");
+                McpUtils.RunNpmCommandAsync("run build", serverPath, timeout, (success, message) =>
+                {
+                    if (success)
+                    {
+                        McpLogger.LogInfo("[MCP Unity] Server build completed successfully.");
+                    }
+                });
             }
         }
         
@@ -523,6 +598,14 @@ namespace McpUnity.Unity
             // Register GetGameObjectSimpleResource (⚡ Optimized - saves 89.5% tokens)
             GetGameObjectSimpleResource getGameObjectSimpleResource = new GetGameObjectSimpleResource();
             _resources.Add(getGameObjectSimpleResource.Name, getGameObjectSimpleResource);
+            
+            // Register GetProjectArchitectureResource (🏗️ Provides global context to AI)
+            GetProjectArchitectureResource getProjectArchitectureResource = new GetProjectArchitectureResource();
+            _resources.Add(getProjectArchitectureResource.Name, getProjectArchitectureResource);
+            
+            // Register GetAllToolsResource (⚡ Optimized - returns all tools in one request)
+            GetAllToolsResource getAllToolsResource = new GetAllToolsResource(this);
+            _resources.Add(getAllToolsResource.Name, getAllToolsResource);
         }
         
         /// <summary>
@@ -548,20 +631,17 @@ namespace McpUnity.Unity
 
         /// <summary>
         /// Handles the Unity Editor's 'before assembly reload' event.
-        /// Stops the WebSocket server to prevent port conflicts and ensure a clean state before scripts are recompiled.
+        /// Server continues running during compilation to allow MCP tools to be used.
         /// </summary>
         private static void OnBeforeAssemblyReload()
         {
-            if (Instance.IsListening)
-            {
-                Instance.StopServer();
-            }
+            // Keep server running during compilation
+            // Tools will queue and execute after compilation completes
         }
 
         /// <summary>
         /// Handles the Unity Editor's 'after assembly reload' event.
-        /// If auto-start is enabled, attempts to restart the WebSocket server if it's not already listening.
-        /// This ensures the server is operational after script recompilation.
+        /// Ensures server is running after script recompilation if auto-start is enabled.
         /// </summary>
         private static void OnAfterAssemblyReload()
         {
@@ -582,17 +662,25 @@ namespace McpUnity.Unity
             {
                 case PlayModeStateChange.ExitingEditMode:
                     // About to enter Play Mode
-                    if (Instance.IsListening)
+                    // Don't stop server if tests are running - they need the connection
+                    if (Instance.IsListening && !Instance.IsRunningTests)
                     {
                         Instance.StopServer();
+                    }
+                    else if (Instance.IsRunningTests)
+                    {
+                        McpLogger.LogInfo("Server kept running during PlayMode test execution");
                     }
                     break;
                 case PlayModeStateChange.EnteredPlayMode:
                 case PlayModeStateChange.ExitingPlayMode:
                     // Server is disabled during play mode as domain reload will be triggered again when stopped.
+                    // However, if tests are running, we need to keep it alive
                     break;
                 case PlayModeStateChange.EnteredEditMode:
                     // Returned to Edit Mode
+                    // Reset the test running flag when returning to edit mode
+                    Instance.IsRunningTests = false;
                     if (!Instance.IsListening && McpUnitySettings.Instance.AutoStartServer)
                     {
                         Instance.StartServer();

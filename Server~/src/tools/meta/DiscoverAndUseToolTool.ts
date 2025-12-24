@@ -13,7 +13,9 @@ const DiscoverAndUseToolArgsSchema = z.object({
     .describe('Name of the Unity tool to execute. Query available tools via unity://tool-names/{category} resources first.'),
   params: z
     .record(z.any())
-    .describe('Parameters to pass to the tool. Schema varies by tool - check resource documentation.')
+    .optional()
+    .default({})
+    .describe('Parameters to pass to the tool. Optional - defaults to empty object. Params are auto-normalized (snake_case → camelCase).')
 });
 
 /**
@@ -50,7 +52,7 @@ const DiscoverAndUseToolArgsSchema = z.object({
  */
 @Tool({
   name: 'discover_and_use_tool',
-  description: '⚠️ SINGLE TOOL ONLY! Use discover_and_use_batch for 2+ operations. 🔴 MUST READ FIRST: Use read_resource("unity://tool-names/{category}") to get exact tool names before calling. DO NOT guess tool names! 📖 unity_tool_discovery 📖 unity_tool_discovery',
+  description: '⚠️ SINGLE TOOL ONLY! 🔧 STEP 3: Execute ONE Unity tool. For 2+ tools, use discover_and_use_batch instead. 📖 unity_tool_discovery',
   category: 'meta',
   version: '1.0.0'
 })
@@ -60,7 +62,7 @@ export class DiscoverAndUseToolTool extends BaseTool {
   }
 
   get description() {
-    return '⚠️ SINGLE TOOL ONLY! Use discover_and_use_batch for 2+ operations. 🔴 MUST READ FIRST: Use read_resource("unity://tool-names/{category}") to get exact tool names before calling. DO NOT guess tool names! 📖 unity_tool_discovery 📖 unity_tool_discovery';
+    return '⚠️ SINGLE TOOL ONLY! 🔧 STEP 3: Execute ONE Unity tool. For 2+ tools, use discover_and_use_batch instead. 📖 unity_tool_discovery';
   }
 
   get inputSchema() {
@@ -91,26 +93,19 @@ export class DiscoverAndUseToolTool extends BaseTool {
       const result = await manager.discoverAndUseTool(toolName, params);
 
       this.logger.info(`[Zero-Registration] Tool '${toolName}' executed successfully`);
-      
-      // Add batch reminder to successful results
-      if (result.content && result.content.length > 0 && result.content[0].type === 'text') {
-        result.content[0].text += '\n\n💡 Tip: Need more tools? Query unity://tool-names/{category} for related tools, or unity://tool-categories for all categories.';
-        result.content[0].text += '\n⚡ For multiple operations, use discover_and_use_batch for better efficiency!';
-      }
-      
+
+      // Result already contains workflow hint from DynamicToolManager
       return result;
-      
+
     } catch (error: any) {
       this.logger.error(`[Zero-Registration] Failed to execute '${toolName}':`, error);
-      
+
       return {
         content: [{
           type: 'text',
           text: `❌ Failed to execute tool '${toolName}': ${error.message}\n\n` +
-                `💡 Tips:\n` +
-                `- Query available tools: read_resource('unity://tool-names/{category}')\n` +
-                `- Check tool name spelling\n` +
-                `- Verify Unity Editor is running and connected`
+                `💡 Check: tool name spelling, Unity Editor connection\n` +
+                `📋 Workflow: list_categories → get_tool_names({category}) → discover_and_use_batch`
         }],
         isError: true
       };

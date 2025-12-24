@@ -4,7 +4,7 @@ import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 export declare class AddJointTool extends BaseTool {
     get name(): string;
     get description(): string;
-    get inputSchema(): z.ZodObject<{
+    get inputSchema(): z.ZodEffects<z.ZodObject<{
         instanceId: z.ZodOptional<z.ZodNumber>;
         gameObjectPath: z.ZodOptional<z.ZodString>;
         jointType: z.ZodEnum<["FixedJoint", "HingeJoint", "SpringJoint", "CharacterJoint", "ConfigurableJoint"]>;
@@ -124,6 +124,104 @@ export declare class AddJointTool extends BaseTool {
             angularZMotion?: "Locked" | "Limited" | "Free" | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
+        jointType: "FixedJoint" | "HingeJoint" | "SpringJoint" | "CharacterJoint" | "ConfigurableJoint";
+        anchor?: {
+            x: number;
+            y: number;
+            z: number;
+        } | undefined;
+        instanceId?: number | undefined;
+        gameObjectPath?: string | undefined;
+        axis?: {
+            x: number;
+            y: number;
+            z: number;
+        } | undefined;
+        connectedInstanceId?: number | undefined;
+        connectedBodyPath?: string | undefined;
+        connectedAnchor?: {
+            x: number;
+            y: number;
+            z: number;
+        } | undefined;
+        breakForce?: number | undefined;
+        breakTorque?: number | undefined;
+        hingeJoint?: {
+            useMotor?: boolean | undefined;
+            motorTargetVelocity?: number | undefined;
+            motorForce?: number | undefined;
+            useLimits?: boolean | undefined;
+            minAngle?: number | undefined;
+            maxAngle?: number | undefined;
+            useSpring?: boolean | undefined;
+            springForce?: number | undefined;
+            springDamper?: number | undefined;
+        } | undefined;
+        springJoint?: {
+            spring?: number | undefined;
+            damper?: number | undefined;
+            minDistance?: number | undefined;
+            maxDistance?: number | undefined;
+            tolerance?: number | undefined;
+        } | undefined;
+        configurableJoint?: {
+            xMotion?: "Locked" | "Limited" | "Free" | undefined;
+            yMotion?: "Locked" | "Limited" | "Free" | undefined;
+            zMotion?: "Locked" | "Limited" | "Free" | undefined;
+            angularXMotion?: "Locked" | "Limited" | "Free" | undefined;
+            angularYMotion?: "Locked" | "Limited" | "Free" | undefined;
+            angularZMotion?: "Locked" | "Limited" | "Free" | undefined;
+        } | undefined;
+    }, {
+        jointType: "FixedJoint" | "HingeJoint" | "SpringJoint" | "CharacterJoint" | "ConfigurableJoint";
+        anchor?: {
+            x: number;
+            y: number;
+            z: number;
+        } | undefined;
+        instanceId?: number | undefined;
+        gameObjectPath?: string | undefined;
+        axis?: {
+            x: number;
+            y: number;
+            z: number;
+        } | undefined;
+        connectedInstanceId?: number | undefined;
+        connectedBodyPath?: string | undefined;
+        connectedAnchor?: {
+            x: number;
+            y: number;
+            z: number;
+        } | undefined;
+        breakForce?: number | undefined;
+        breakTorque?: number | undefined;
+        hingeJoint?: {
+            useMotor?: boolean | undefined;
+            motorTargetVelocity?: number | undefined;
+            motorForce?: number | undefined;
+            useLimits?: boolean | undefined;
+            minAngle?: number | undefined;
+            maxAngle?: number | undefined;
+            useSpring?: boolean | undefined;
+            springForce?: number | undefined;
+            springDamper?: number | undefined;
+        } | undefined;
+        springJoint?: {
+            spring?: number | undefined;
+            damper?: number | undefined;
+            minDistance?: number | undefined;
+            maxDistance?: number | undefined;
+            tolerance?: number | undefined;
+        } | undefined;
+        configurableJoint?: {
+            xMotion?: "Locked" | "Limited" | "Free" | undefined;
+            yMotion?: "Locked" | "Limited" | "Free" | undefined;
+            zMotion?: "Locked" | "Limited" | "Free" | undefined;
+            angularXMotion?: "Locked" | "Limited" | "Free" | undefined;
+            angularYMotion?: "Locked" | "Limited" | "Free" | undefined;
+            angularZMotion?: "Locked" | "Limited" | "Free" | undefined;
+        } | undefined;
+    }>, {
         jointType: "FixedJoint" | "HingeJoint" | "SpringJoint" | "CharacterJoint" | "ConfigurableJoint";
         anchor?: {
             x: number;

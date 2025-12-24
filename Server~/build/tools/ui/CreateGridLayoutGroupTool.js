@@ -40,6 +40,7 @@ import { Tool, Tags } from '../base/ToolDecorators.js';
  */
 const CreateGridLayoutGroupToolArgsSchema = z.object({
     panelName: z.string().optional().default('GridPanel').describe('Name for the Grid Panel GameObject. Default: "GridPanel"'),
+    position: z.array(z.number()).length(3).optional().describe('Position as [x, y, z]. Fallback to posX/posY/posZ if not provided'),
     posX: z.number().optional().default(0).describe('X position in canvas space. Default: 0'),
     posY: z.number().optional().default(0).describe('Y position in canvas space. Default: 0'),
     width: z.number().optional().default(400).describe('Width of the panel. Default: 400'),

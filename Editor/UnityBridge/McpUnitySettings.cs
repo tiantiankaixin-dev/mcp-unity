@@ -15,7 +15,7 @@ namespace McpUnity.Unity
         // Constants
         public const string ServerVersion = "1.1.2";
         public const string PackageName = "com.gamelovers.mcp-unity";
-        public const int RequestTimeoutMinimum = 10;
+        public const int RequestTimeoutMinimum = 60;
         
         // Paths
         private const string SettingsPath = "ProjectSettings/McpUnitySettings.json";
@@ -26,7 +26,7 @@ namespace McpUnity.Unity
         public int Port = 8090;
         
         [Tooltip("Timeout in seconds for tool request")]
-        public int RequestTimeoutSeconds = RequestTimeoutMinimum;
+        public int RequestTimeoutSeconds = 120; // 默认120秒，长时间操作需要更多时间
         
         [Tooltip("Whether to automatically start the MCP server when Unity opens")]
         public bool AutoStartServer = true;
@@ -48,6 +48,12 @@ namespace McpUnity.Unity
 
         [Tooltip("Host for Node.js MCP Server WebSocket mode (default: 0.0.0.0)")]
         public string McpWebSocketHost = "0.0.0.0";
+
+        [Tooltip("Automatically install npm dependencies on startup (disable if you want manual control)")]
+        public bool AutoInstallDependencies = true;
+
+        [Tooltip("Timeout in seconds for npm install/build operations (default: 300 seconds / 5 minutes)")]
+        public int NpmInstallTimeoutSeconds = 300;
 
         /// <summary>
         /// Singleton instance of settings

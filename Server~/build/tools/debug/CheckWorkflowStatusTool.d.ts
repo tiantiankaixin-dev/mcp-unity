@@ -4,6 +4,9 @@ import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 /**
  * Tool to check the current workflow status and resource access history
  * Useful for debugging workflow validation issues
+ *
+ * This is a server-only tool - it does not require Unity connection
+ * and executes entirely on the MCP server.
  */
 export declare class CheckWorkflowStatusTool extends BaseTool {
     get name(): string;

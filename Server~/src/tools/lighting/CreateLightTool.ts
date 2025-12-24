@@ -10,7 +10,8 @@ const CreateLightToolArgsSchema = z.object({
   lightType: z.string().optional().default('directional').describe('Type of light: "directional", "point", "spot", "area". Default: "directional"'),
   lightName: z.string().optional().default('Light').describe('Name for the light GameObject. Default: "Light"'),
   intensity: z.number().optional().default(1).describe('Light intensity. Default: 1'),
-  color: z.string().optional().default('#FFFFFF').describe('Light color in hex format. Default: "#FFFFFF"'),
+  color: z.array(z.number()).length(4).optional().default([1, 1, 1, 1]).describe('Color as RGBA [r,g,b,a] (0-1). Default: [1,1,1,1]'),
+  position: z.array(z.number()).length(3).optional().describe('Position as [x, y, z]. Fallback to posX/posY/posZ if not provided'),
   posX: z.number().optional().default(0).describe('X position. Default: 0'),
   posY: z.number().optional().default(3).describe('Y position. Default: 3'),
   posZ: z.number().optional().default(0).describe('Z position. Default: 0')

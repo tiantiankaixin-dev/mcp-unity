@@ -845,5 +845,98 @@ namespace McpUnity.Utils
 
             return false;
         }
+
+        /// <summary>
+        /// Runs an npm command asynchronously to avoid blocking the main thread.
+        /// Uses System.Threading.Tasks for background execution.
+        /// </summary>
+        /// <param name="arguments">Arguments to pass to npm (e.g., "install" or "run build").</param>
+        /// <param name="workingDirectory">The working directory where the npm command should be executed.</param>
+        /// <param name="timeoutSeconds">Maximum time to wait for command completion (default: 300 seconds / 5 minutes).</param>
+        /// <param name="onComplete">Callback invoked on completion with success status and message.</param>
+        public static void RunNpmCommandAsync(string arguments, string workingDirectory, int timeoutSeconds = 300, Action<bool, string> onComplete = null)
+        {
+            System.Threading.Tasks.Task.Run(() =>
+            {
+                string npmExecutable = McpUnitySettings.Instance.NpmExecutablePath;
+                bool useCustomNpmPath = !string.IsNullOrWhiteSpace(npmExecutable);
+
+                System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    WorkingDirectory = workingDirectory,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                if (useCustomNpmPath)
+                {
+                    startInfo.FileName = npmExecutable;
+                    startInfo.Arguments = arguments;
+                }
+                else if (Application.platform == RuntimePlatform.WindowsEditor)
+                {
+                    startInfo.FileName = "cmd.exe";
+                    startInfo.Arguments = $"/c npm {arguments}";
+                }
+                else
+                {
+                    startInfo.FileName = "/bin/bash";
+                    startInfo.Arguments = $"-c \"npm {arguments}\"";
+                    
+                    string currentPath = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
+                    string extraPaths = "/usr/local/bin:/opt/homebrew/bin";
+                    startInfo.EnvironmentVariables["PATH"] = $"{extraPaths}:{currentPath}";
+                }
+
+                try
+                {
+                    using (var process = System.Diagnostics.Process.Start(startInfo))
+                    {
+                        if (process == null)
+                        {
+                            string errorMsg = $"[MCP Unity] Failed to start npm process with arguments: {arguments} in {workingDirectory}. Process object is null.";
+                            EditorApplication.delayCall += () => Debug.LogError(errorMsg);
+                            onComplete?.Invoke(false, errorMsg);
+                            return;
+                        }
+
+                        bool completed = process.WaitForExit(timeoutSeconds * 1000);
+                        
+                        if (!completed)
+                        {
+                            process.Kill();
+                            string timeoutMsg = $"[MCP Unity] npm {arguments} timed out after {timeoutSeconds} seconds in {workingDirectory}.";
+                            EditorApplication.delayCall += () => Debug.LogWarning(timeoutMsg);
+                            onComplete?.Invoke(false, timeoutMsg);
+                            return;
+                        }
+
+                        string output = process.StandardOutput.ReadToEnd();
+                        string error = process.StandardError.ReadToEnd();
+
+                        if (process.ExitCode == 0)
+                        {
+                            string successMsg = $"[MCP Unity] npm {arguments} completed successfully in {workingDirectory}.\n{output}";
+                            EditorApplication.delayCall += () => Debug.Log(successMsg);
+                            onComplete?.Invoke(true, successMsg);
+                        }
+                        else
+                        {
+                            string errorMsg = $"[MCP Unity] npm {arguments} failed in {workingDirectory}. Exit Code: {process.ExitCode}. Error: {error}";
+                            EditorApplication.delayCall += () => Debug.LogError(errorMsg);
+                            onComplete?.Invoke(false, errorMsg);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    string exceptionMsg = $"[MCP Unity] Exception while running npm {arguments} in {workingDirectory}. Error: {ex.Message}";
+                    EditorApplication.delayCall += () => Debug.LogError(exceptionMsg);
+                    onComplete?.Invoke(false, exceptionMsg);
+                }
+            });
+        }
     }
 }

@@ -8,11 +8,19 @@ import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 export declare class SelectGameObjectTool extends BaseTool {
     get name(): string;
     get description(): string;
-    get inputSchema(): z.ZodObject<{
+    get inputSchema(): z.ZodEffects<z.ZodObject<{
         objectPath: z.ZodOptional<z.ZodString>;
         objectName: z.ZodOptional<z.ZodString>;
         instanceId: z.ZodOptional<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
+        instanceId?: number | undefined;
+        objectPath?: string | undefined;
+        objectName?: string | undefined;
+    }, {
+        instanceId?: number | undefined;
+        objectPath?: string | undefined;
+        objectName?: string | undefined;
+    }>, {
         instanceId?: number | undefined;
         objectPath?: string | undefined;
         objectName?: string | undefined;

@@ -10,6 +10,7 @@ export declare class CreateUISliderTool extends BaseTool {
     get description(): string;
     get inputSchema(): z.ZodObject<{
         sliderName: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+        position: z.ZodOptional<z.ZodArray<z.ZodNumber, "many">>;
         posX: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         posY: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         minValue: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
@@ -22,7 +23,9 @@ export declare class CreateUISliderTool extends BaseTool {
         sliderName: string;
         minValue: number;
         maxValue: number;
+        position?: number[] | undefined;
     }, {
+        position?: number[] | undefined;
         posX?: number | undefined;
         posY?: number | undefined;
         defaultValue?: number | undefined;

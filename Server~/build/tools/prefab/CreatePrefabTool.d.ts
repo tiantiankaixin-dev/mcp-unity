@@ -8,7 +8,7 @@ import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 export declare class CreatePrefabTool extends BaseTool {
     get name(): string;
     get description(): string;
-    get inputSchema(): z.ZodObject<{
+    get inputSchema(): z.ZodEffects<z.ZodObject<{
         instanceId: z.ZodOptional<z.ZodNumber>;
         gameObjectPath: z.ZodOptional<z.ZodString>;
         prefabName: z.ZodString;
@@ -17,6 +17,22 @@ export declare class CreatePrefabTool extends BaseTool {
         fieldValues: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodAny>>;
         overwrite: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     }, "strip", z.ZodTypeAny, {
+        savePath: string;
+        prefabName: string;
+        overwrite: boolean;
+        instanceId?: number | undefined;
+        gameObjectPath?: string | undefined;
+        componentName?: string | undefined;
+        fieldValues?: Record<string, any> | undefined;
+    }, {
+        prefabName: string;
+        savePath?: string | undefined;
+        instanceId?: number | undefined;
+        gameObjectPath?: string | undefined;
+        componentName?: string | undefined;
+        fieldValues?: Record<string, any> | undefined;
+        overwrite?: boolean | undefined;
+    }>, {
         savePath: string;
         prefabName: string;
         overwrite: boolean;

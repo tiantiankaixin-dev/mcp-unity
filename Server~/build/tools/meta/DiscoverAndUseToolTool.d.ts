@@ -38,13 +38,13 @@ export declare class DiscoverAndUseToolTool extends BaseTool {
     get description(): string;
     get inputSchema(): z.ZodObject<{
         toolName: z.ZodString;
-        params: z.ZodRecord<z.ZodString, z.ZodAny>;
+        params: z.ZodDefault<z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodAny>>>;
     }, "strip", z.ZodTypeAny, {
         params: Record<string, any>;
         toolName: string;
     }, {
-        params: Record<string, any>;
         toolName: string;
+        params?: Record<string, any> | undefined;
     }>;
     get category(): string;
     /**

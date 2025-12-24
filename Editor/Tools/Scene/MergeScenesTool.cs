@@ -92,7 +92,17 @@ namespace McpUnity.Tools
                     }
                 }
 
-                // 4. 处理目标场景
+                // 4. 先静默保存当前已修改的场景，避免弹出保存对话框
+                for (int i = 0; i < SceneManager.sceneCount; i++)
+                {
+                    var currentScene = SceneManager.GetSceneAt(i);
+                    if (currentScene.isDirty && !string.IsNullOrEmpty(currentScene.path))
+                    {
+                        EditorSceneManager.SaveScene(currentScene);
+                    }
+                }
+                
+                // 5. 处理目标场景
                 Scene targetScene;
                 
                 if (createNew)

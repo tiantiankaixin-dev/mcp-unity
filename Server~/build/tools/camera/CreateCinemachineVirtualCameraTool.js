@@ -40,6 +40,7 @@ import { Tool, Tags } from '../base/ToolDecorators.js';
  */
 const CreateCinemachineVirtualCameraToolArgsSchema = z.object({
     cameraName: z.string().optional().default('VirtualCamera').describe('Name for the virtual camera GameObject. Default: "VirtualCamera"'),
+    position: z.array(z.number()).length(3).optional().describe('Position as [x, y, z]. Fallback to posX/posY/posZ if not provided'),
     posX: z.number().optional().default(0).describe('X position. Default: 0'),
     posY: z.number().optional().default(1.5).describe('Y position. Default: 1.5'),
     posZ: z.number().optional().default(-10).describe('Z position. Default: -10'),

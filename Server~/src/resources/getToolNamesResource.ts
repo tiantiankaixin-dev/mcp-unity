@@ -3,7 +3,6 @@ import { ResourceTemplate, McpServer } from '@modelcontextprotocol/sdk/server/mc
 import { ReadResourceResult } from '@modelcontextprotocol/sdk/types.js';
 import { Variables } from '@modelcontextprotocol/sdk/shared/uriTemplate.js';
 import { ToolRegistry } from '../tools/base/ToolRegistry.js';
-import { zodToReadableSchema } from '../utils/zodToJsonSchema.js';
 
 // Constants for the resource
 const resourceName = 'get_tool_names';
@@ -12,8 +11,8 @@ const resourceMimeType = 'application/json';
 
 /**
  * Creates and registers the tool names resource
- * Returns tool names WITH parameter schemas for AI to use correct parameter names
- * 
+ * Returns tool names and descriptions only (no parameter schemas)
+ *
  * @param server The MCP server instance to register with
  * @param logger The logger instance for diagnostic information
  */
@@ -33,7 +32,7 @@ export function registerGetToolNamesResource(server: McpServer, logger: Logger) 
     resourceName,
     resourceTemplate,
     {
-      description: 'Get tool schemas. MUST use discover_and_use_batch for 2+ operations! Categories: gameobject, material, physics, ui, terrain, animation, scripting, scene, prefab, lighting, camera, audio, vfx',
+      description: 'Returns tool names for a category. Go directly to discover_and_use_batch after this.',
       mimeType: resourceMimeType
     },
     async (uri: URL, variables: Variables) => {
@@ -48,7 +47,7 @@ export function registerGetToolNamesResource(server: McpServer, logger: Logger) 
 }
 
 /**
- * Handles requests for tool names only
+ * Handles requests for tool names and descriptions only
  */
 async function resourceHandler(uri: URL, variables: Variables, logger: Logger): Promise<ReadResourceResult> {
   const category = variables["category"] as string;
@@ -96,7 +95,7 @@ async function resourceHandler(uri: URL, variables: Variables, logger: Logger): 
     };
   }
   
-  // Get names, descriptions AND parameter schemas
+  // Get names and descriptions only (no parameter schemas)
   const tools = toolClasses.map(ToolClass => {
     try {
       const mockServer = {} as any;
@@ -107,24 +106,13 @@ async function resourceHandler(uri: URL, variables: Variables, logger: Logger): 
         warn: () => {},
         error: () => {}
       } as any;
-      
+
       const instance = new ToolClass(mockServer, mockMcpUnity, mockLogger);
       const metadata = instance.getMetadata();
-      
-      // Convert Zod schema to readable format
-      let parameters;
-      try {
-        const inputSchema = instance.inputSchema;
-        parameters = zodToReadableSchema(inputSchema);
-      } catch (error) {
-        logger.warn(`Failed to convert schema for ${metadata.name}:`, error);
-        parameters = undefined;
-      }
-      
+
       return {
         name: metadata.name,
-        description: metadata.description,
-        ...(parameters && Object.keys(parameters).length > 0 && { parameters })
+        description: metadata.description
       };
     } catch (error) {
       logger.error(`Failed to get metadata for tool in ${category}:`, error);
@@ -136,8 +124,7 @@ async function resourceHandler(uri: URL, variables: Variables, logger: Logger): 
   });
   
   const response = {
-    // CRITICAL instruction for AI
-    _batch: "⚠️ ALWAYS use discover_and_use_batch for 2+ operations! Chain outputs with $.{index}.field",
+    _workflow: "✅ STEP 2 done → Go to STEP 3: discover_and_use_batch",
     category: category,
     toolCount: tools.length,
     tools: tools

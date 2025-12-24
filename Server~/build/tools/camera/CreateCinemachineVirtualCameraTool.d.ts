@@ -10,6 +10,7 @@ export declare class CreateCinemachineVirtualCameraTool extends BaseTool {
     get description(): string;
     get inputSchema(): z.ZodObject<{
         cameraName: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+        position: z.ZodOptional<z.ZodArray<z.ZodNumber, "many">>;
         posX: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         posY: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         posZ: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
@@ -20,7 +21,9 @@ export declare class CreateCinemachineVirtualCameraTool extends BaseTool {
         posZ: number;
         cameraName: string;
         priority: number;
+        position?: number[] | undefined;
     }, {
+        position?: number[] | undefined;
         posX?: number | undefined;
         posY?: number | undefined;
         posZ?: number | undefined;

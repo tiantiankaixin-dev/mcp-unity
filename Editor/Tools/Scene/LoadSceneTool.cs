@@ -82,10 +82,18 @@ namespace McpUnity.Tools
 
             try
             {
-                // Avoid any save prompts: save open scenes before replacing them (non-additive)
+                // 静默保存所有已修改的场景，避免弹出保存对话框阻塞主线程
                 if (!additive)
                 {
-                    UnityEditor.SceneManagement.EditorSceneManager.SaveOpenScenes();
+                    // 遍历所有打开的场景，静默保存已修改的场景
+                    for (int i = 0; i < UnityEngine.SceneManagement.SceneManager.sceneCount; i++)
+                    {
+                        var scene = UnityEngine.SceneManagement.SceneManager.GetSceneAt(i);
+                        if (scene.isDirty && !string.IsNullOrEmpty(scene.path))
+                        {
+                            UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene);
+                        }
+                    }
                 }
 
                 var mode = additive

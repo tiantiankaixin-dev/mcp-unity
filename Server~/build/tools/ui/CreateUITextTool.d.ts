@@ -10,21 +10,24 @@ export declare class CreateUITextTool extends BaseTool {
     get description(): string;
     get inputSchema(): z.ZodObject<{
         text: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+        position: z.ZodOptional<z.ZodArray<z.ZodNumber, "many">>;
         posX: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         posY: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         fontSize: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
-        color: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+        color: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodNumber, "many">>>;
     }, "strip", z.ZodTypeAny, {
         text: string;
         posX: number;
         posY: number;
-        color: string;
+        color: number[];
         fontSize: number;
+        position?: number[] | undefined;
     }, {
         text?: string | undefined;
+        position?: number[] | undefined;
         posX?: number | undefined;
         posY?: number | undefined;
-        color?: string | undefined;
+        color?: number[] | undefined;
         fontSize?: number | undefined;
     }>;
     get category(): string;

@@ -40,11 +40,12 @@ import { Tool, Tags } from '../base/ToolDecorators.js';
  */
 const CreateUIPanelToolArgsSchema = z.object({
     panelName: z.string().optional().default('Panel').describe('Name for the Panel GameObject. Default: "Panel"'),
+    position: z.array(z.number()).length(3).optional().describe('Position as [x, y, z]. Fallback to posX/posY/posZ if not provided'),
     posX: z.number().optional().default(0).describe('X position in canvas space. Default: 0'),
     posY: z.number().optional().default(0).describe('Y position in canvas space. Default: 0'),
     width: z.number().optional().default(400).describe('Width of the panel. Default: 400'),
     height: z.number().optional().default(300).describe('Height of the panel. Default: 300'),
-    color: z.string().optional().default('#FFFFFF80').describe('Panel color in hex format with alpha. Default: "#FFFFFF80"')
+    color: z.array(z.number()).length(4).optional().default([1, 1, 1, 1]).describe('Color as RGBA [r,g,b,a] (0-1). Default: [1,1,1,1]')
 });
 /**
  * CreateUIPanel Tool

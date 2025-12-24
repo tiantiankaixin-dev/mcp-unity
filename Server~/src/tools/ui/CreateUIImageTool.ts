@@ -12,6 +12,7 @@ const CreateUIImageToolArgsSchema = z.object({
     .optional()
     .default('Image')
     .describe('Name for the Image GameObject. Default: "Image"'),
+  position: z.array(z.number()).length(2).optional().describe('Position as [x, y] in canvas space. Fallback to posX/posY if not provided'),
   posX: z
     .number()
     .optional()
@@ -32,11 +33,7 @@ const CreateUIImageToolArgsSchema = z.object({
     .optional()
     .default(100)
     .describe('Height of the image. Default: 100'),
-  color: z
-    .string()
-    .optional()
-    .default('#FFFFFF')
-    .describe('Color in hex format. Example: "#FFFFFF". Default: "#FFFFFF"'),
+  color: z.array(z.number()).length(4).optional().default([1, 1, 1, 1]).describe('Color as RGBA [r,g,b,a] (0-1). Default: [1,1,1,1]'),
   spritePath: z
     .string()
     .optional()

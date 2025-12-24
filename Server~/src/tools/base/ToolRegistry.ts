@@ -13,6 +13,7 @@ export interface ToolMetadata {
   version?: string;
   deprecated?: boolean;
   tags?: string[];
+  serverOnly?: boolean;
 }
 
 /**

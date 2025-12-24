@@ -44,6 +44,7 @@ const CreateUITextToolArgsSchema = z.object({
         .optional()
         .default('Text')
         .describe('Text content to display. Default: "Text"'),
+    position: z.array(z.number()).length(2).optional().describe('Position as [x, y] in canvas space. Fallback to posX/posY if not provided'),
     posX: z
         .number()
         .optional()
@@ -60,11 +61,7 @@ const CreateUITextToolArgsSchema = z.object({
         .optional()
         .default(14)
         .describe('Font size. Default: 14'),
-    color: z
-        .string()
-        .optional()
-        .default('#000000')
-        .describe('Text color in hex format. Example: "#000000". Default: "#000000"')
+    color: z.array(z.number()).length(4).optional().default([0, 0, 0, 1]).describe('Text color as RGBA [r,g,b,a] (0-1). Default: [0,0,0,1] (black)')
 });
 /**
  * CreateUIText Tool

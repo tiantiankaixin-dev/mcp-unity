@@ -37,6 +37,8 @@ const CreatePrefabToolArgsSchema = z.object({
     .optional()
     .default(false)
     .describe('Whether to overwrite existing prefab with same name. Default: false')
+}).refine(data => data.instanceId !== undefined || data.gameObjectPath, {
+  message: "Either 'instanceId' or 'gameObjectPath' is required"
 });
 
 /**

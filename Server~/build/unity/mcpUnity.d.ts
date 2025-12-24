@@ -12,6 +12,8 @@ export declare class McpUnity {
     private pendingRequests;
     private requestTimeout;
     private retryDelay;
+    private maxRetries;
+    private domainReloadRetryDelay;
     constructor(logger: Logger);
     /**
      * Start the Unity connection with retry mechanism
@@ -44,9 +46,21 @@ export declare class McpUnity {
      */
     stop(): Promise<void>;
     /**
-     * Send a request to the Unity server
+     * Send a request to the Unity server with automatic retry for domain reload recovery
      */
     sendRequest(request: UnityRequest): Promise<any>;
+    /**
+     * Internal method to send request with retry logic
+     */
+    private sendRequestWithRetry;
+    /**
+     * Internal method to send a single request
+     */
+    private sendRequestInternal;
+    /**
+     * Helper method to sleep for a given duration
+     */
+    private sleep;
     /**
      * Check if connected to Unity
      * Only returns true if the connection is guaranteed to be active

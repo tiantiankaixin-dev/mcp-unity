@@ -34,7 +34,7 @@ var __runInitializers = (this && this.__runInitializers) || function (thisArg, i
 };
 import { z } from 'zod';
 import { BaseTool } from '../base/BaseTool.js';
-import { Tool, Tags } from '../base/ToolDecorators.js';
+import { Tool, Tags, Async } from '../base/ToolDecorators.js';
 /**
  * Input schema for bake_lighting tool
  */
@@ -44,11 +44,13 @@ const BakeLightingToolArgsSchema = z.object({
 /**
  * BakeLighting Tool
  * Bakes lighting for the scene
+ *
+ * Note: This is a long-running async operation (up to 5 minutes timeout on Unity side)
  */
 let BakeLightingTool = (() => {
-    let _classDecorators = [Tool({
+    let _classDecorators = [Async(), Tool({
             name: 'bake_lighting',
-            description: 'Bakes lighting for the scene',
+            description: 'Bakes lighting for the scene. This is a long-running operation that may take several minutes.',
             category: 'lighting',
             version: '1.0.0'
         }), Tags(['unity', 'lighting', 'bake'])];

@@ -40,7 +40,7 @@ import { Tool, Tags } from '../base/ToolDecorators.js';
  */
 const CreateSkyboxToolArgsSchema = z.object({
     skyboxType: z.string().optional().default('procedural').describe('Type of skybox. Options: "procedural", "6sided", "cubemap", "panoramic". Default: "procedural"'),
-    color: z.string().optional().default('#87CEEB').describe('Sky tint color in hex format. Example: "#87CEEB". Default: "#87CEEB"')
+    color: z.array(z.number()).length(4).optional().default([1, 1, 1, 1]).describe('Color as RGBA [r,g,b,a] (0-1). Default: [1,1,1,1]')
 });
 /**
  * CreateSkybox Tool

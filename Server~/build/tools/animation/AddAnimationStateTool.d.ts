@@ -39,24 +39,24 @@ export declare class AddAnimationStateTool extends BaseTool {
         isDefaultState: boolean;
         animationClipPath?: string | undefined;
         clipPath?: string | undefined;
-        controllerPath?: string | undefined;
-        animatorControllerPath?: string | undefined;
         position?: {
             x: number;
             y: number;
         } | undefined;
+        controllerPath?: string | undefined;
+        animatorControllerPath?: string | undefined;
         tag?: string | undefined;
     }, {
         stateName: string;
         animationClipPath?: string | undefined;
         clipPath?: string | undefined;
-        controllerPath?: string | undefined;
-        animatorControllerPath?: string | undefined;
-        layerIndex?: number | undefined;
         position?: {
             x: number;
             y: number;
         } | undefined;
+        controllerPath?: string | undefined;
+        animatorControllerPath?: string | undefined;
+        layerIndex?: number | undefined;
         speed?: number | undefined;
         cycleOffset?: number | undefined;
         mirror?: boolean | undefined;
@@ -75,24 +75,24 @@ export declare class AddAnimationStateTool extends BaseTool {
         isDefaultState: boolean;
         animationClipPath?: string | undefined;
         clipPath?: string | undefined;
-        controllerPath?: string | undefined;
-        animatorControllerPath?: string | undefined;
         position?: {
             x: number;
             y: number;
         } | undefined;
+        controllerPath?: string | undefined;
+        animatorControllerPath?: string | undefined;
         tag?: string | undefined;
     }, {
         stateName: string;
         animationClipPath?: string | undefined;
         clipPath?: string | undefined;
-        controllerPath?: string | undefined;
-        animatorControllerPath?: string | undefined;
-        layerIndex?: number | undefined;
         position?: {
             x: number;
             y: number;
         } | undefined;
+        controllerPath?: string | undefined;
+        animatorControllerPath?: string | undefined;
+        layerIndex?: number | undefined;
         speed?: number | undefined;
         cycleOffset?: number | undefined;
         mirror?: boolean | undefined;
@@ -112,23 +112,23 @@ export declare class AddAnimationStateTool extends BaseTool {
         writeDefaultValues: boolean;
         isDefaultState: boolean;
         clipPath?: string | undefined;
-        controllerPath?: string | undefined;
         position?: {
             x: number;
             y: number;
         } | undefined;
+        controllerPath?: string | undefined;
         tag?: string | undefined;
     }, {
         stateName: string;
         animationClipPath?: string | undefined;
         clipPath?: string | undefined;
-        controllerPath?: string | undefined;
-        animatorControllerPath?: string | undefined;
-        layerIndex?: number | undefined;
         position?: {
             x: number;
             y: number;
         } | undefined;
+        controllerPath?: string | undefined;
+        animatorControllerPath?: string | undefined;
+        layerIndex?: number | undefined;
         speed?: number | undefined;
         cycleOffset?: number | undefined;
         mirror?: boolean | undefined;

@@ -22,11 +22,82 @@ namespace McpUnity.Tools
             try
             {
                 string imageName = parameters["imageName"]?.ToObject<string>() ?? "Image";
-                float posX = parameters["posX"]?.ToObject<float>() ?? 0f;
-                float posY = parameters["posY"]?.ToObject<float>() ?? 0f;
+                // ✅ 支持两种位置格式 (2D UI)
+
+                float posX = 0f, posY = 0f;
+
+                if (parameters["position"] != null && parameters["position"].Type == JTokenType.Array)
+
+                {
+
+                    var pos = parameters["position"].ToObject<float[]>();
+
+                    if (pos.Length >= 2)
+
+                    {
+
+                        posX = pos[0];
+
+                        posY = pos[1];
+
+                    }
+
+                }
+
+                else
+
+                {
+
+                    posX = parameters["posX"]?.ToObject<float>() ?? 0f;
+
+                    posY = parameters["posY"]?.ToObject<float>() ?? 0f;
+
+                }
                 float width = parameters["width"]?.ToObject<float>() ?? 100f;
                 float height = parameters["height"]?.ToObject<float>() ?? 100f;
-                string colorHex = parameters["color"]?.ToObject<string>() ?? "#FFFFFF";
+                // ✅ 支持两种颜色格式
+
+                Color color = Color.white;
+
+                if (parameters["color"] != null)
+
+                {
+
+                    var colorToken = parameters["color"];
+
+                    if (colorToken.Type == JTokenType.Array)
+
+                    {
+
+                        var rgba = colorToken.ToObject<float[]>();
+
+                        if (rgba.Length >= 3)
+
+                        {
+
+                            color = new Color(rgba[0], rgba[1], rgba[2], rgba.Length > 3 ? rgba[3] : 1f);
+
+                        }
+
+                    }
+
+                    else if (colorToken.Type == JTokenType.String)
+
+                    {
+
+                        string colorHex = colorToken.ToObject<string>();
+
+                        if (!ColorUtility.TryParseHtmlString(colorHex, out color))
+
+                        {
+
+                            color = Color.white;
+
+                        }
+
+                    }
+
+                }
                 string spritePath = parameters["spritePath"]?.ToObject<string>();
 
                 Canvas canvas = UnityEngine.Object.FindFirstObjectByType<Canvas>();
@@ -48,12 +119,7 @@ namespace McpUnity.Tools
                 rectTransform.sizeDelta = new Vector2(width, height);
 
                 Image image = imageObj.AddComponent<Image>();
-
-                // 设置颜色
-                if (ColorUtility.TryParseHtmlString(colorHex, out Color color))
-                {
-                    image.color = color;
-                }
+                image.color = color;
 
                 // 加载精灵
                 if (!string.IsNullOrEmpty(spritePath))

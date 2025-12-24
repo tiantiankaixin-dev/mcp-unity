@@ -68,7 +68,7 @@ const DiscoverAndUseBatchArgsSchema = z.object({
  */
 @Tool({
   name: 'discover_and_use_batch',
-  description: '🚀 PREFERRED! Execute multiple Unity tools in ONE call. Chain with $.{index}.field. 🔴 MUST READ FIRST: Use read_resource("unity://tool-names/{category}") to get exact tool names before calling. DO NOT guess tool names! 📖 unity_tool_discovery 📖 unity_tool_discovery',
+  description: '🚀 PREFERRED! 📋 STEP 3: Execute multiple Unity tools in ONE call. Chain outputs with $.{index}.field syntax.',
   category: 'meta',
   version: '2.0.0'
 })
@@ -78,7 +78,7 @@ export class DiscoverAndUseBatchTool extends BaseTool {
   }
 
   get description() {
-    return '🚀 PREFERRED! Execute multiple Unity tools in ONE call. Chain with $.{index}.field. 🔴 MUST READ FIRST: Use read_resource("unity://tool-names/{category}") to get exact tool names before calling. DO NOT guess tool names! 📖 unity_tool_discovery 📖 unity_tool_discovery';
+    return '🚀 PREFERRED! 📋 STEP 3: Execute multiple Unity tools in ONE call. Chain outputs with $.{index}.field syntax.';
   }
 
   get inputSchema() {
@@ -151,6 +151,7 @@ export class DiscoverAndUseBatchTool extends BaseTool {
         if (errorMessage.includes('GameObject required') || errorMessage.includes('instanceIds')) {
           errorMessage += '\n💡 Hint: instanceIds requires ARRAY format: ["$.0.instanceId"] not "$.0.instanceId"';
         }
+        errorMessage += `\n💡 If parameter error, use read_resource('unity://tool/${toolName}') to check correct params.`;
         
         results.push({
           index: i,
@@ -198,7 +199,7 @@ export class DiscoverAndUseBatchTool extends BaseTool {
     return {
       content: [{
         type: 'text',
-        text: summary + detailsText
+        text: summary + detailsText + '\n📖 unity_tool_discovery'
       }],
       isError: failureCount > 0
     };

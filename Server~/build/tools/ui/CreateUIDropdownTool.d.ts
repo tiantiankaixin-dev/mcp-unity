@@ -10,6 +10,7 @@ export declare class CreateUIDropdownTool extends BaseTool {
     get description(): string;
     get inputSchema(): z.ZodObject<{
         dropdownName: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+        position: z.ZodOptional<z.ZodArray<z.ZodNumber, "many">>;
         posX: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         posY: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         width: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
@@ -22,8 +23,10 @@ export declare class CreateUIDropdownTool extends BaseTool {
         height: number;
         dropdownName: string;
         options?: string[] | undefined;
+        position?: number[] | undefined;
     }, {
         options?: string[] | undefined;
+        position?: number[] | undefined;
         posX?: number | undefined;
         posY?: number | undefined;
         width?: number | undefined;

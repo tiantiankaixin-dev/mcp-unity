@@ -40,6 +40,7 @@ import { Tool, Tags } from '../base/ToolDecorators.js';
  */
 const CreateUIToggleToolArgsSchema = z.object({
     toggleName: z.string().optional().default('Toggle').describe('Name for the Toggle GameObject. Default: "Toggle"'),
+    position: z.array(z.number()).length(3).optional().describe('Position as [x, y, z]. Fallback to posX/posY/posZ if not provided'),
     posX: z.number().optional().default(0).describe('X position in canvas space. Default: 0'),
     posY: z.number().optional().default(0).describe('Y position in canvas space. Default: 0'),
     labelText: z.string().optional().default('Toggle').describe('Label text for the toggle. Default: "Toggle"'),

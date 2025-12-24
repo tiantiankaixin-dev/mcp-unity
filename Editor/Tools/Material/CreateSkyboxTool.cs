@@ -22,7 +22,49 @@ namespace McpUnity.Tools
             try
             {
                 string skyboxType = parameters["skyboxType"]?.ToObject<string>()?.ToLower() ?? "procedural";
-                string colorHex = parameters["color"]?.ToObject<string>() ?? "#87CEEB";
+                // ✅ 支持两种颜色格式
+
+                Color color = Color.white;
+
+                if (parameters["color"] != null)
+
+                {
+
+                    var colorToken = parameters["color"];
+
+                    if (colorToken.Type == JTokenType.Array)
+
+                    {
+
+                        var rgba = colorToken.ToObject<float[]>();
+
+                        if (rgba.Length >= 3)
+
+                        {
+
+                            color = new Color(rgba[0], rgba[1], rgba[2], rgba.Length > 3 ? rgba[3] : 1f);
+
+                        }
+
+                    }
+
+                    else if (colorToken.Type == JTokenType.String)
+
+                    {
+
+                        string colorHex = colorToken.ToObject<string>();
+
+                        if (!ColorUtility.TryParseHtmlString(colorHex, out color))
+
+                        {
+
+                            color = Color.white;
+
+                        }
+
+                    }
+
+                }
 
                 Material skyboxMaterial = null;
 
@@ -46,12 +88,9 @@ namespace McpUnity.Tools
                 if (skyboxMaterial != null)
                 {
                     // 设置颜色
-                    if (ColorUtility.TryParseHtmlString(colorHex, out Color color))
+                    if (skyboxMaterial.HasProperty("_SkyTint"))
                     {
-                        if (skyboxMaterial.HasProperty("_SkyTint"))
-                        {
-                            skyboxMaterial.SetColor("_SkyTint", color);
-                        }
+                        skyboxMaterial.SetColor("_SkyTint", color);
                     }
 
                     RenderSettings.skybox = skyboxMaterial;
@@ -62,7 +101,7 @@ namespace McpUnity.Tools
                         ["success"] = true,
                         ["message"] = $"Created and applied {skyboxType} skybox.",
                         ["skyboxType"] = skyboxType,
-                        ["color"] = colorHex
+                        ["color"] = new JArray(color.r, color.g, color.b, color.a)
                     };
                 }
                 else

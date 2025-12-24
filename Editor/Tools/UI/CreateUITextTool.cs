@@ -23,10 +23,81 @@ namespace McpUnity.Tools
             try
             {
                 string text = parameters["text"]?.ToObject<string>() ?? "Text";
-                float posX = parameters["posX"]?.ToObject<float>() ?? 0f;
-                float posY = parameters["posY"]?.ToObject<float>() ?? 0f;
+                // ✅ 支持两种位置格式 (2D UI)
+
+                float posX = 0f, posY = 0f;
+
+                if (parameters["position"] != null && parameters["position"].Type == JTokenType.Array)
+
+                {
+
+                    var pos = parameters["position"].ToObject<float[]>();
+
+                    if (pos.Length >= 2)
+
+                    {
+
+                        posX = pos[0];
+
+                        posY = pos[1];
+
+                    }
+
+                }
+
+                else
+
+                {
+
+                    posX = parameters["posX"]?.ToObject<float>() ?? 0f;
+
+                    posY = parameters["posY"]?.ToObject<float>() ?? 0f;
+
+                }
                 int fontSize = parameters["fontSize"]?.ToObject<int>() ?? 14;
-                string colorHex = parameters["color"]?.ToObject<string>() ?? "#000000";
+                // ✅ 支持两种颜色格式
+
+                Color color = Color.white;
+
+                if (parameters["color"] != null)
+
+                {
+
+                    var colorToken = parameters["color"];
+
+                    if (colorToken.Type == JTokenType.Array)
+
+                    {
+
+                        var rgba = colorToken.ToObject<float[]>();
+
+                        if (rgba.Length >= 3)
+
+                        {
+
+                            color = new Color(rgba[0], rgba[1], rgba[2], rgba.Length > 3 ? rgba[3] : 1f);
+
+                        }
+
+                    }
+
+                    else if (colorToken.Type == JTokenType.String)
+
+                    {
+
+                        string colorHex = colorToken.ToObject<string>();
+
+                        if (!ColorUtility.TryParseHtmlString(colorHex, out color))
+
+                        {
+
+                            color = Color.white;
+
+                        }
+
+                    }
+
+                }
 
                 Canvas canvas = UnityEngine.Object.FindFirstObjectByType<Canvas>();
                 if (canvas == null)
@@ -45,12 +116,6 @@ namespace McpUnity.Tools
                 RectTransform rectTransform = textObj.AddComponent<RectTransform>();
                 rectTransform.anchoredPosition = new Vector2(posX, posY);
                 rectTransform.sizeDelta = new Vector2(200, 50);
-
-                Color color;
-                if (!ColorUtility.TryParseHtmlString(colorHex, out color))
-                {
-                    color = Color.black;
-                }
 
                 // 尝试使用TextMeshPro
                 try

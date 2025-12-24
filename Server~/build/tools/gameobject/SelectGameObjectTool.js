@@ -52,6 +52,8 @@ const SelectGameObjectToolArgsSchema = z.object({
         .int()
         .optional()
         .describe('Instance ID of the GameObject to select')
+}).refine(data => data.objectPath || data.objectName || data.instanceId !== undefined, {
+    message: "Required parameter 'objectPath', 'objectName' or 'instanceId' not provided"
 });
 /**
  * SelectGameObject Tool

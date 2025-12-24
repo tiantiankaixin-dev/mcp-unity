@@ -10,12 +10,12 @@ export declare class CreateSkyboxTool extends BaseTool {
     get description(): string;
     get inputSchema(): z.ZodObject<{
         skyboxType: z.ZodDefault<z.ZodOptional<z.ZodString>>;
-        color: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+        color: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodNumber, "many">>>;
     }, "strip", z.ZodTypeAny, {
-        color: string;
+        color: number[];
         skyboxType: string;
     }, {
-        color?: string | undefined;
+        color?: number[] | undefined;
         skyboxType?: string | undefined;
     }>;
     get category(): string;

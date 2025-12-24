@@ -26,6 +26,7 @@ const CATEGORY_DESCRIPTIONS: Record<string, string> = {
   'lighting': 'Lighting & baking',
   'material': 'Materials & colors',
   'menu': 'Menu execution',
+  'meta': 'Meta tools',
   'physics': 'Physics & colliders',
   'prefab': 'Prefabs',
   'scene': 'Scene management',
@@ -51,7 +52,7 @@ export function registerGetToolCategoriesResource(server: McpServer, logger: Log
     resourceName,
     resourceUri,
     {
-      description: 'Get Unity tool categories. IMPORTANT: Always use discover_and_use_batch for 2+ operations (mandatory). Use unity://tool-names/{cat} for schemas.',
+      description: '🚨 PLAN FIRST! Get categories, then query unity://tool-names/{category}. MANDATORY: discover_and_use_batch for 2+ tools with $.{index}.field chaining.',
       mimeType: resourceMimeType
     },
     async () => {
@@ -80,27 +81,30 @@ async function resourceHandler(logger: Logger): Promise<ReadResourceResult> {
   const categories = ToolRegistry.getCategories();
   const stats = ToolRegistry.getStatistics();
   
-  // Build category information (minimal format for token efficiency)
-  // Only name and description - count is not needed for decision making
-  const categoryInfo = categories.map(category => ({
-    name: category,
-    desc: CATEGORY_DESCRIPTIONS[category] || 'Tools'
-  }));
+  // Build category information with tool counts (merged from getAllToolsResource)
+  const categorySummary: Record<string, { description: string; toolCount: number }> = {};
+  let totalToolCount = 0;
   
-  // Add virtual "getting-started" category at the beginning (priority)
-  const allCategories = [
-    {
-      name: '⭐getting-started',
-      desc: 'START HERE! Quick guide & best practices'
-    },
-    ...categoryInfo
-  ];
+  for (const category of categories) {
+    const toolClasses = ToolRegistry.getToolsByCategory(category);
+    if (toolClasses.length === 0) continue;
+    
+    const toolCount = toolClasses.length;
+    totalToolCount += toolCount;
+    
+    categorySummary[category] = {
+      description: CATEGORY_DESCRIPTIONS[category] || 'Tools',
+      toolCount: toolCount
+    };
+  }
   
   // Minimal response with mandatory batch usage instruction
   const response = {
     // CRITICAL: Force AI to use batch operations
-    _instruction: "⚠️ MANDATORY: Use discover_and_use_batch for 2+ tool calls. Chain with $.{index}.field (e.g., $.0.instanceId). Single tool only for 1 operation.",
-    categories: allCategories
+    _instruction: "🚨 WORKFLOW: 1) Query unity://tool-names/{category} for specific tools, 2) Use discover_and_use_batch for 2+ tools with $.{index}.field chaining, 3) Max 100 tools per batch",
+    totalToolCount: totalToolCount,
+    categoryCount: Object.keys(categorySummary).length,
+    categories: categorySummary
   };
   
   return {

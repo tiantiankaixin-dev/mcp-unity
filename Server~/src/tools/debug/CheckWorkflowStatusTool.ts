@@ -1,12 +1,24 @@
 import { z } from 'zod';
 import { BaseTool } from '../base/BaseTool.js';
+import { Tool, Tags, ServerOnly } from '../base/ToolDecorators.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { UsageTracker } from '../../utils/UsageTracker.js';
 
 /**
  * Tool to check the current workflow status and resource access history
  * Useful for debugging workflow validation issues
+ * 
+ * This is a server-only tool - it does not require Unity connection
+ * and executes entirely on the MCP server.
  */
+@ServerOnly()
+@Tool({
+  name: 'check_workflow_status',
+  description: 'Check the current workflow status, resource access history, and tool usage statistics',
+  category: 'debug',
+  version: '1.0.0'
+})
+@Tags(['unity', 'debug', 'workflow', 'status'])
 export class CheckWorkflowStatusTool extends BaseTool {
   get name(): string {
     return 'check_workflow_status';

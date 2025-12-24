@@ -10,6 +10,7 @@ export declare class CreateUIInputFieldTool extends BaseTool {
     get description(): string;
     get inputSchema(): z.ZodObject<{
         inputFieldName: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+        position: z.ZodOptional<z.ZodArray<z.ZodNumber, "many">>;
         posX: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         posY: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         width: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
@@ -22,7 +23,9 @@ export declare class CreateUIInputFieldTool extends BaseTool {
         height: number;
         inputFieldName: string;
         placeholder: string;
+        position?: number[] | undefined;
     }, {
+        position?: number[] | undefined;
         posX?: number | undefined;
         posY?: number | undefined;
         width?: number | undefined;

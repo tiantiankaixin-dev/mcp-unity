@@ -90,6 +90,11 @@ export declare class DynamicToolManager {
      */
     private createTempInstance;
     /**
+     * Normalize parameter names from snake_case to camelCase based on tool schema
+     * This allows AI to use either format without errors
+     */
+    private normalizeParams;
+    /**
      * Reset (for testing)
      */
     reset(): void;

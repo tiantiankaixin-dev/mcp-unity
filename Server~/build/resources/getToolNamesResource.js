@@ -1,13 +1,12 @@
 import { ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { ToolRegistry } from '../tools/base/ToolRegistry.js';
-import { zodToReadableSchema } from '../utils/zodToJsonSchema.js';
 // Constants for the resource
 const resourceName = 'get_tool_names';
 const resourceUri = 'unity://tool-names/{category}';
 const resourceMimeType = 'application/json';
 /**
  * Creates and registers the tool names resource
- * Returns tool names WITH parameter schemas for AI to use correct parameter names
+ * Returns tool names and descriptions only (no parameter schemas)
  *
  * @param server The MCP server instance to register with
  * @param logger The logger instance for diagnostic information
@@ -20,7 +19,7 @@ export function registerGetToolNamesResource(server, logger) {
     });
     // Register this templated resource with the MCP server
     server.resource(resourceName, resourceTemplate, {
-        description: 'Get tool schemas. MUST use discover_and_use_batch for 2+ operations! Categories: gameobject, material, physics, ui, terrain, animation, scripting, scene, prefab, lighting, camera, audio, vfx',
+        description: 'Returns tool names for a category. Go directly to discover_and_use_batch after this.',
         mimeType: resourceMimeType
     }, async (uri, variables) => {
         try {
@@ -33,7 +32,7 @@ export function registerGetToolNamesResource(server, logger) {
     });
 }
 /**
- * Handles requests for tool names only
+ * Handles requests for tool names and descriptions only
  */
 async function resourceHandler(uri, variables, logger) {
     const category = variables["category"];
@@ -76,7 +75,7 @@ async function resourceHandler(uri, variables, logger) {
                 }]
         };
     }
-    // Get names, descriptions AND parameter schemas
+    // Get names and descriptions only (no parameter schemas)
     const tools = toolClasses.map(ToolClass => {
         try {
             const mockServer = {};
@@ -89,20 +88,9 @@ async function resourceHandler(uri, variables, logger) {
             };
             const instance = new ToolClass(mockServer, mockMcpUnity, mockLogger);
             const metadata = instance.getMetadata();
-            // Convert Zod schema to readable format
-            let parameters;
-            try {
-                const inputSchema = instance.inputSchema;
-                parameters = zodToReadableSchema(inputSchema);
-            }
-            catch (error) {
-                logger.warn(`Failed to convert schema for ${metadata.name}:`, error);
-                parameters = undefined;
-            }
             return {
                 name: metadata.name,
-                description: metadata.description,
-                ...(parameters && Object.keys(parameters).length > 0 && { parameters })
+                description: metadata.description
             };
         }
         catch (error) {
@@ -114,8 +102,7 @@ async function resourceHandler(uri, variables, logger) {
         }
     });
     const response = {
-        // CRITICAL instruction for AI
-        _batch: "⚠️ ALWAYS use discover_and_use_batch for 2+ operations! Chain outputs with $.{index}.field",
+        _workflow: "✅ STEP 2 done → Go to STEP 3: discover_and_use_batch",
         category: category,
         toolCount: tools.length,
         tools: tools

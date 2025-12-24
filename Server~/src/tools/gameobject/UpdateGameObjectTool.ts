@@ -33,7 +33,7 @@ const UpdateGameObjectToolArgsSchema = z.object({
  */
 @Tool({
   name: 'update_gameobject',
-  description: 'Updates GameObject properties',
+  description: 'Updates GameObject metadata (name/tag/layer/active/static). NOT for Transform - use update_component instead.',
   category: 'gameobject',
   version: '1.0.0'
 })
@@ -44,7 +44,7 @@ export class UpdateGameObjectTool extends BaseTool {
   }
 
   get description() {
-    return 'Updates GameObject properties';
+    return 'Updates GameObject metadata (name/tag/layer/active/static). NOT for Transform - use update_component instead.';
   }
 
   get inputSchema() {

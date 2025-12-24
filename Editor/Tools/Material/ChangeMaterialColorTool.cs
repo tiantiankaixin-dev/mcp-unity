@@ -22,19 +22,37 @@ namespace McpUnity.Tools
             try
             {
                 JArray instanceIdsArray = parameters["instanceIds"] as JArray;
-                string colorHex = parameters["color"]?.ToObject<string>() ?? "#FFFFFF";
                 string propertyName = parameters["propertyName"]?.ToObject<string>() ?? "_Color";
+
+                // ✅ 支持两种颜色格式
+                Color color = Color.white;
+                if (parameters["color"] != null)
+                {
+                    var colorToken = parameters["color"];
+                    if (colorToken.Type == JTokenType.Array)
+                    {
+                        // 数组格式: color: [r, g, b, a] (0-1 范围)
+                        var rgba = colorToken.ToObject<float[]>();
+                        if (rgba.Length >= 3)
+                        {
+                            color = new Color(rgba[0], rgba[1], rgba[2], rgba.Length > 3 ? rgba[3] : 1f);
+                        }
+                    }
+                    else if (colorToken.Type == JTokenType.String)
+                    {
+                        // 字符串格式: color: "#FF0000"
+                        string colorHex = colorToken.ToObject<string>();
+                        if (!ColorUtility.TryParseHtmlString(colorHex, out color))
+                        {
+                            color = Color.white;
+                        }
+                    }
+                }
 
                 if (instanceIdsArray == null || instanceIdsArray.Count == 0)
                 {
                     return McpUnitySocketHandler.CreateErrorResponse(
                         "At least 1 GameObject required.", "validation_error");
-                }
-
-                if (!ColorUtility.TryParseHtmlString(colorHex, out Color color))
-                {
-                    return McpUnitySocketHandler.CreateErrorResponse(
-                        $"Invalid color format: {colorHex}", "validation_error");
                 }
 
                 List<GameObject> objects = new List<GameObject>();
@@ -53,22 +71,22 @@ namespace McpUnity.Tools
                     if (renderer != null && renderer.sharedMaterial != null)
                     {
                         Material mat = renderer.sharedMaterial;
-                        
+
                         // 创建材质实例以避免修改共享材质
                         Material instanceMat = new Material(mat);
-                        
+
                         if (instanceMat.HasProperty(propertyName))
                         {
                             instanceMat.SetColor(propertyName, color);
                             renderer.sharedMaterial = instanceMat;
-                            
+
                             Undo.RecordObject(renderer, "Change Material Color");
                             EditorUtility.SetDirty(renderer);
 
                             changedArray.Add(new JObject
                             {
                                 ["objectName"] = obj.name,
-                                ["color"] = colorHex
+                                ["color"] = color.r + "," + color.g + "," + color.b + "," + color.a
                             });
                             count++;
                         }
@@ -80,7 +98,7 @@ namespace McpUnity.Tools
                     ["success"] = true,
                     ["message"] = $"Changed material color on {count} GameObject(s).",
                     ["count"] = count,
-                    ["color"] = colorHex,
+                    ["color"] = new JArray(color.r, color.g, color.b, color.a),
                     ["changedObjects"] = changedArray
                 };
             }

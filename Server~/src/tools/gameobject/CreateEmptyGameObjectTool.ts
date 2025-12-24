@@ -5,6 +5,7 @@ import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 
 const CreateEmptyGameObjectToolArgsSchema = z.object({
   objectName: z.string().optional().default('GameObject').describe('Name for the new GameObject. Default: "GameObject"'),
+  position: z.array(z.number()).length(3).optional().describe('Position as [x, y, z]. Fallback to posX/posY/posZ if not provided'),
   posX: z.number().optional().default(0).describe('X position. Default: 0'),
   posY: z.number().optional().default(0).describe('Y position. Default: 0'),
   posZ: z.number().optional().default(0).describe('Z position. Default: 0'),
@@ -13,14 +14,14 @@ const CreateEmptyGameObjectToolArgsSchema = z.object({
 
 @Tool({
   name: 'create_empty_gameobject',
-  description: 'Create an empty GameObject with only a Transform component.',
+  description: 'Create empty GameObject. Params: objectName?, posX?, posY?, posZ?, parentInstanceId?',
   category: 'gameobject',
   version: '1.0.0'
 })
 @Tags(['unity', 'gameobject', 'create', 'empty'])
 export class CreateEmptyGameObjectTool extends BaseTool {
   get name() { return 'create_empty_gameobject'; }
-  get description() { return 'Create an empty GameObject with only a Transform component.'; }
+  get description() { return 'Create empty GameObject. Params: objectName?, posX?, posY?, posZ?, parentInstanceId?'; }
   get inputSchema() { return CreateEmptyGameObjectToolArgsSchema; }
   get category() { return 'gameobject'; }
 }

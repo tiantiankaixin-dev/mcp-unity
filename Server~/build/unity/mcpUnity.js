@@ -4,7 +4,7 @@ import { McpUnityError, ErrorType } from '../utils/errors.js';
 import { promises as fs } from 'fs';
 import path from 'path';
 // Top-level constant for the Unity settings JSON path
-const MCP_UNITY_SETTINGS_PATH = path.resolve(process.cwd(), '../ProjectSettings/McpUnitySettings.json');
+const MCP_UNITY_SETTINGS_PATH = process.env.MCP_UNITY_SETTINGS_PATH || path.resolve(process.cwd(), '../ProjectSettings/McpUnitySettings.json');
 export class McpUnity {
     logger;
     port = null;
@@ -13,6 +13,8 @@ export class McpUnity {
     pendingRequests = new Map();
     requestTimeout = 10000;
     retryDelay = 1000;
+    maxRetries = 3; // Maximum retries for domain reload recovery
+    domainReloadRetryDelay = 2000; // Wait time between retries during domain reload
     constructor(logger) {
         this.logger = logger;
     }
@@ -47,15 +49,17 @@ export class McpUnity {
      */
     async parseAndSetConfig() {
         const config = await this.readConfigFileAsJson();
+        const envPort = process.env.UNITY_PORT ? parseInt(process.env.UNITY_PORT, 10) : undefined;
         const configPort = config.Port;
-        this.port = configPort ? parseInt(configPort, 10) : 8090;
+        this.port = (envPort && !isNaN(envPort)) ? envPort : (configPort ? parseInt(configPort, 10) : 8090);
         this.logger.info(`Using port: ${this.port} for Unity WebSocket connection`);
         // Check environment variable first, then config file, then default to localhost
         const configHost = process.env.UNITY_HOST || config.Host;
         this.host = configHost || 'localhost';
-        // Initialize timeout from environment variable (in seconds; it is the same as Cline) or use default (10 seconds)
+        // Initialize timeout from environment variable (in seconds; it is the same as Cline) or use default (120 seconds for long operations)
+        const envTimeout = process.env.UNITY_REQUEST_TIMEOUT ? parseInt(process.env.UNITY_REQUEST_TIMEOUT, 10) : undefined;
         const configTimeout = config.RequestTimeoutSeconds;
-        this.requestTimeout = configTimeout ? parseInt(configTimeout, 10) * 1000 : 10000;
+        this.requestTimeout = (envTimeout && !isNaN(envTimeout)) ? envTimeout * 1000 : (configTimeout ? parseInt(configTimeout, 10) * 1000 : 120000);
         this.logger.info(`Using request timeout: ${this.requestTimeout / 1000} seconds`);
     }
     /**
@@ -187,13 +191,30 @@ export class McpUnity {
         return Promise.resolve();
     }
     /**
-     * Send a request to the Unity server
+     * Send a request to the Unity server with automatic retry for domain reload recovery
      */
     async sendRequest(request) {
+        return this.sendRequestWithRetry(request, 0);
+    }
+    /**
+     * Internal method to send request with retry logic
+     */
+    async sendRequestWithRetry(request, retryCount) {
         // Ensure we're connected first
         if (!this.isConnected) {
             this.logger.info('Not connected to Unity, connecting first...');
-            await this.connect();
+            try {
+                await this.connect();
+            }
+            catch (connError) {
+                // Connection failed - might be domain reload in progress
+                if (retryCount < this.maxRetries) {
+                    this.logger.warn(`Connection failed, Unity may be reloading. Retry ${retryCount + 1}/${this.maxRetries} in ${this.domainReloadRetryDelay}ms...`);
+                    await this.sleep(this.domainReloadRetryDelay);
+                    return this.sendRequestWithRetry(request, retryCount + 1);
+                }
+                throw connError;
+            }
         }
         // Use given id or generate a new one
         const requestId = request.id || uuidv4();
@@ -201,6 +222,25 @@ export class McpUnity {
             ...request,
             id: requestId
         };
+        try {
+            return await this.sendRequestInternal(message, requestId);
+        }
+        catch (err) {
+            // Check if this is a connection error that might be due to domain reload
+            if (err instanceof McpUnityError &&
+                (err.type === ErrorType.CONNECTION || err.message.includes('Connection closed')) &&
+                retryCount < this.maxRetries) {
+                this.logger.warn(`Request failed due to connection issue. Unity may be reloading. Retry ${retryCount + 1}/${this.maxRetries} in ${this.domainReloadRetryDelay}ms...`);
+                await this.sleep(this.domainReloadRetryDelay);
+                return this.sendRequestWithRetry(request, retryCount + 1);
+            }
+            throw err;
+        }
+    }
+    /**
+     * Internal method to send a single request
+     */
+    sendRequestInternal(message, requestId) {
         return new Promise((resolve, reject) => {
             // Double check isConnected again after await
             if (!this.ws || !this.isConnected) {
@@ -232,6 +272,12 @@ export class McpUnity {
                 reject(new McpUnityError(ErrorType.CONNECTION, `Send failed: ${err instanceof Error ? err.message : String(err)}`));
             }
         });
+    }
+    /**
+     * Helper method to sleep for a given duration
+     */
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
     /**
      * Check if connected to Unity
